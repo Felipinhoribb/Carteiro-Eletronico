@@ -60,7 +60,7 @@ public class Interface {
 			public void run() {
 				try {
 					//here you can put the selected theme class name in JTattoo
-		            UIManager.setLookAndFeel("com.jtattoo.plaf.noire.NoireLookAndFeel");
+		            UIManager.setLookAndFeel("com.jtattoo.plaf.hifi.HiFiLookAndFeel");
 					Interface window = new Interface();
 					window.frmCartEletronico.setVisible(true);
 				} catch (ClassNotFoundException ex) {
@@ -156,8 +156,11 @@ public class Interface {
 		cbxDependencia.setEnabled(false);
 		pnlMilitares.add(cbxDependencia);
 		
-		JButton btnAddMil = new JButton("Incluir");
-		btnAddMil.setBounds(12, 22, 99, 23);
+		JButton btnAddMil = new JButton("   Incluir");
+		btnAddMil.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnAddMil.setHorizontalAlignment(SwingConstants.LEFT);
+		btnAddMil.setIcon(new ImageIcon(Interface.class.getResource("/img/plus(1).png")));
+		btnAddMil.setBounds(12, 22, 109, 27);
 		btnAddMil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				txtNomeGuerra.setEnabled(true);
@@ -172,8 +175,11 @@ public class Interface {
 		});
 		pnlMilitares.add(btnAddMil);
 		
-		btnAlterMil = new JButton("Alterar");
-		btnAlterMil.setBounds(12, 71, 99, 23);
+		btnAlterMil = new JButton("  Alterar");
+		btnAlterMil.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnAlterMil.setHorizontalAlignment(SwingConstants.LEFT);
+		btnAlterMil.setIcon(new ImageIcon(Interface.class.getResource("/img/edit.png")));
+		btnAlterMil.setBounds(12, 71, 109, 27);
 		btnAlterMil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -194,8 +200,11 @@ public class Interface {
 		});
 		pnlMilitares.add(btnAlterMil);
 		
-		btnRmvMil = new JButton("Remover");
-		btnRmvMil.setBounds(12, 121, 99, 23);
+		btnRmvMil = new JButton(" Remover");
+		btnRmvMil.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnRmvMil.setHorizontalAlignment(SwingConstants.LEFT);
+		btnRmvMil.setIcon(new ImageIcon(Interface.class.getResource("/img/remove(1).png")));
+		btnRmvMil.setBounds(12, 121, 109, 27);
 		btnRmvMil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (txtNomeGuerra.getText().isEmpty()) {
@@ -207,14 +216,21 @@ public class Interface {
 		});
 		pnlMilitares.add(btnRmvMil);
 		
-		btnSaveMil = new JButton("Salvar");
-		btnSaveMil.setBounds(664, 87, 99, 23);
+		btnSaveMil = new JButton("  Salvar");
+		btnSaveMil.setHorizontalAlignment(SwingConstants.LEFT);
+		btnSaveMil.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnSaveMil.setIcon(new ImageIcon(Interface.class.getResource("/img/check(1).png")));
+		btnSaveMil.setBounds(664, 87, 104, 27);
 		btnSaveMil.setAlignmentX(Component.CENTER_ALIGNMENT);
 		btnSaveMil.setEnabled(false);
 		pnlMilitares.add(btnSaveMil);
 		
 		btnCancelMil = new JButton("Cancelar");
-		btnCancelMil.setBounds(664, 147, 99, 23);
+		btnCancelMil.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnCancelMil.setHorizontalAlignment(SwingConstants.LEFT);
+		btnCancelMil.setAlignmentX(Component.CENTER_ALIGNMENT);
+		btnCancelMil.setIcon(new ImageIcon(Interface.class.getResource("/img/remove.png")));
+		btnCancelMil.setBounds(664, 147, 106, 27);
 		btnCancelMil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -281,7 +297,10 @@ public class Interface {
 		table_1.setBounds(12, 197, 843, 186);
 		pnlDependencias.add(table_1);
 		
-		JButton btnAddDpdncia = new JButton("Incluir");
+		JButton btnAddDpdncia = new JButton("   Incluir");
+		btnAddDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnAddDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
+		btnAddDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/plus(1).png")));
 		btnAddDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				txtDependencia.setEnabled(true);
@@ -293,10 +312,13 @@ public class Interface {
 				btnRmvDpdncia.setEnabled(false);
 			}
 		});
-		btnAddDpdncia.setBounds(12, 22, 99, 23);
+		btnAddDpdncia.setBounds(12, 22, 109, 27);
 		pnlDependencias.add(btnAddDpdncia);
 		
-		btnAlterDpdncia = new JButton("Alterar");
+		btnAlterDpdncia = new JButton("  Alterar");
+		btnAlterDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnAlterDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
+		btnAlterDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/edit.png")));
 		btnAlterDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//Verifica se o usuário selecionou algum registro da tabela
@@ -313,10 +335,13 @@ public class Interface {
 				}
 			}
 		});
-		btnAlterDpdncia.setBounds(12, 80, 99, 23);
+		btnAlterDpdncia.setBounds(12, 80, 109, 27);
 		pnlDependencias.add(btnAlterDpdncia);
 		
-		btnRmvDpdncia = new JButton("Remover");
+		btnRmvDpdncia = new JButton(" Remover");
+		btnRmvDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnRmvDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
+		btnRmvDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/remove(1).png")));
 		btnRmvDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (txtDependencia.getText().isEmpty()) {
@@ -326,7 +351,7 @@ public class Interface {
 				}
 			}
 		});
-		btnRmvDpdncia.setBounds(12, 136, 99, 23);
+		btnRmvDpdncia.setBounds(12, 136, 109, 27);
 		pnlDependencias.add(btnRmvDpdncia);
 		
 		txtContato = new JTextField();
@@ -336,12 +361,18 @@ public class Interface {
 		txtContato.setBounds(318, 138, 234, 23);
 		pnlDependencias.add(txtContato);
 		
-		btnSaveDpdncia = new JButton("Salvar");
+		btnSaveDpdncia = new JButton("  Salvar");
+		btnSaveDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnSaveDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
+		btnSaveDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/check(1).png")));
 		btnSaveDpdncia.setEnabled(false);
-		btnSaveDpdncia.setBounds(668, 74, 99, 23);
+		btnSaveDpdncia.setBounds(641, 77, 109, 27);
 		pnlDependencias.add(btnSaveDpdncia);
 		
-		btnCancelDpdncia = new JButton("Cancelar");
+		btnCancelDpdncia = new JButton(" Cancelar");
+		btnCancelDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnCancelDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
+		btnCancelDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/remove.png")));
 		btnCancelDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				//esvazia os campos
@@ -361,7 +392,7 @@ public class Interface {
 			}
 		});
 		btnCancelDpdncia.setEnabled(false);
-		btnCancelDpdncia.setBounds(668, 133, 99, 23);
+		btnCancelDpdncia.setBounds(641, 136, 109, 27);
 		pnlDependencias.add(btnCancelDpdncia);
 		
 		Panel pnlProtocolos = new Panel();
@@ -418,6 +449,8 @@ public class Interface {
 				rdbNud.setSelected(false);
 				txtNumDiex.setVisible(true);
 				lblNumDiex.setVisible(true);
+				txtNumDiex.setEnabled(true);
+				lblNumDiex.setEnabled(true);
 			}
 		});
 		rdbDiex.setEnabled(false);
@@ -461,7 +494,10 @@ public class Interface {
 		txtCaixa.setBounds(343, 218, 97, 23);
 		pnlProtocolos.add(txtCaixa);
 		
-		JButton btnAddPrtclo = new JButton("Incluir");
+		JButton btnAddPrtclo = new JButton("   Incluir");
+		btnAddPrtclo.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnAddPrtclo.setHorizontalAlignment(SwingConstants.LEFT);
+		btnAddPrtclo.setIcon(new ImageIcon(Interface.class.getResource("/img/plus(1).png")));
 		btnAddPrtclo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				rdbDiex.setEnabled(true);
@@ -477,10 +513,13 @@ public class Interface {
 				btnAlterPrtclo.setEnabled(false);
 			}
 		});
-		btnAddPrtclo.setBounds(12, 22, 99, 23);
+		btnAddPrtclo.setBounds(12, 22, 110, 27);
 		pnlProtocolos.add(btnAddPrtclo);
 		
-			btnAlterPrtclo = new JButton("Alterar");
+			btnAlterPrtclo = new JButton("  Alterar");
+			btnAlterPrtclo.setHorizontalTextPosition(SwingConstants.RIGHT);
+			btnAlterPrtclo.setHorizontalAlignment(SwingConstants.LEFT);
+			btnAlterPrtclo.setIcon(new ImageIcon(Interface.class.getResource("/img/edit.png")));
 			btnAlterPrtclo.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent arg0) {
 					//Verifica se o usuário selecionou algum registro da tabela
@@ -500,10 +539,13 @@ public class Interface {
 					}
 				}
 			});
-		btnAlterPrtclo.setBounds(12, 91, 99, 23);
+		btnAlterPrtclo.setBounds(12, 91, 110, 27);
 		pnlProtocolos.add(btnAlterPrtclo);
 		
-		btnRmvPrtclo = new JButton("Remover");
+		btnRmvPrtclo = new JButton(" Remover");
+		btnRmvPrtclo.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnRmvPrtclo.setHorizontalAlignment(SwingConstants.LEFT);
+		btnRmvPrtclo.setIcon(new ImageIcon(Interface.class.getResource("/img/remove(1).png")));
 		btnRmvPrtclo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (cbxSindicante.getSelectedIndex() == -1) {
@@ -514,15 +556,21 @@ public class Interface {
 			}
 		});
 		btnRmvPrtclo.setAlignmentX(Component.CENTER_ALIGNMENT);
-		btnRmvPrtclo.setBounds(12, 155, 99, 23);
+		btnRmvPrtclo.setBounds(12, 155, 110, 27);
 		pnlProtocolos.add(btnRmvPrtclo);
 		
-		btnSavePrtclo = new JButton("Salvar");
+		btnSavePrtclo = new JButton("  Salvar");
+		btnSavePrtclo.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnSavePrtclo.setHorizontalAlignment(SwingConstants.LEFT);
+		btnSavePrtclo.setIcon(new ImageIcon(Interface.class.getResource("/img/check(1).png")));
 		btnSavePrtclo.setEnabled(false);
-		btnSavePrtclo.setBounds(683, 96, 99, 23);
+		btnSavePrtclo.setBounds(651, 96, 110, 27);
 		pnlProtocolos.add(btnSavePrtclo);
 		
-		btnCancelPtrclo = new JButton("Cancelar");
+		btnCancelPtrclo = new JButton(" Cancelar");
+		btnCancelPtrclo.setHorizontalTextPosition(SwingConstants.RIGHT);
+		btnCancelPtrclo.setHorizontalAlignment(SwingConstants.LEFT);
+		btnCancelPtrclo.setIcon(new ImageIcon(Interface.class.getResource("/img/remove.png")));
 		btnCancelPtrclo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				
@@ -553,7 +601,7 @@ public class Interface {
 			}
 		});
 		btnCancelPtrclo.setEnabled(false);
-		btnCancelPtrclo.setBounds(683, 155, 99, 23);
+		btnCancelPtrclo.setBounds(651, 155, 110, 27);
 		pnlProtocolos.add(btnCancelPtrclo);
 	}
 }

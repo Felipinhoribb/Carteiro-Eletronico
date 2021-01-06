@@ -33,6 +33,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.table.DefaultTableModel;
 
 public class Interface {
 
@@ -40,8 +41,6 @@ public class Interface {
 	
 	private JTextField txtNumDiex, txtDependencia, txtOM, txtNomeGuerra, txtIdentidade, txtDateNascmnto, txtCaixa,
 	txtContato;
-	
-	private JTable tbl, table, table_1;
 	
 	private JButton btnCancelMil, btnSaveMil, btnAlterMil, btnRmvMil, btnAlterDpdncia, btnRmvDpdncia, btnSaveDpdncia,
 	btnAddPrtclo, btnCancelDpdncia, btnAlterPrtclo, btnRmvPrtclo, btnSavePrtclo, btnCancelPtrclo;
@@ -51,6 +50,10 @@ public class Interface {
 	private JComboBox cbxDependencia, cbxSindicante, cbxSindicado, cbxGraduacao;
 	 
 	private JRadioButton rdbDiex, rdbNud;
+	private JTable tblMil;
+	private JScrollPane scrlpDependecia;
+	private JTable tblDependencia;
+	private JTable table;
 
 	/**
 	 * Launch the application.
@@ -88,6 +91,7 @@ public class Interface {
 	 */
 	private void initialize() {
 		frmCartEletronico = new JFrame();
+		frmCartEletronico.setIconImage(Toolkit.getDefaultToolkit().getImage(Interface.class.getResource("/img/army.png")));
 		frmCartEletronico.setFont(new Font("Liberation Serif", Font.BOLD, 14));
 		frmCartEletronico.setTitle("Carteiro Eletrônico");
 		frmCartEletronico.setBounds(100, 100, 877, 468);
@@ -146,10 +150,6 @@ public class Interface {
 		lblTitleMil.setBounds(300, 12, 250, 37);
 		lblTitleMil.setFont(new Font("Liberation Sans", Font.BOLD, 24));
 		pnlMilitares.add(lblTitleMil);
-		
-		tbl = new JTable();
-		tbl.setBounds(12, 222, 843, 159);
-		pnlMilitares.add(tbl);
 		
 		cbxDependencia = new JComboBox();
 		cbxDependencia.setBounds(316, 166, 234, 23);
@@ -255,49 +255,76 @@ public class Interface {
 		btnCancelMil.setEnabled(false);
 		pnlMilitares.add(btnCancelMil);
 		
+		JScrollPane scrlpMil = new JScrollPane();
+		scrlpMil.setBounds(12, 239, 841, 157);
+		pnlMilitares.add(scrlpMil);
+		
+		tblMil = new JTable();
+		tblMil.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"ID", "Nome de Guerra", "Identidade", "Gradua\u00E7\u00E3o", "Depend\u00EAncia"
+			}
+		) {
+			boolean[] columnEditables = new boolean[] {
+				false, false, false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
+		tblMil.getColumnModel().getColumn(0).setResizable(false);
+		tblMil.getColumnModel().getColumn(1).setResizable(false);
+		tblMil.getColumnModel().getColumn(1).setPreferredWidth(171);
+		tblMil.getColumnModel().getColumn(2).setResizable(false);
+		tblMil.getColumnModel().getColumn(2).setPreferredWidth(123);
+		tblMil.getColumnModel().getColumn(3).setResizable(false);
+		tblMil.getColumnModel().getColumn(3).setPreferredWidth(99);
+		tblMil.getColumnModel().getColumn(4).setResizable(false);
+		tblMil.getColumnModel().getColumn(4).setPreferredWidth(108);
+		scrlpMil.setViewportView(tblMil);
+		
 		Panel pnlDependencias = new Panel();
-		pnlDependencias.setLayout(null);
 		mainTabs.addTab("Dependências", new ImageIcon(Interface.class.getResource("/img/army.png")), pnlDependencias, null);
+		pnlDependencias.setLayout(null);
 		
 		JLabel lblNomeDaDependncia = new JLabel("Nome da Dependência:");
-		lblNomeDaDependncia.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		lblNomeDaDependncia.setBounds(161, 80, 149, 15);
+		lblNomeDaDependncia.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		pnlDependencias.add(lblNomeDaDependncia);
 		
 		txtDependencia = new JTextField();
+		txtDependencia.setBounds(318, 76, 234, 23);
 		txtDependencia.setEnabled(false);
 		txtDependencia.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		txtDependencia.setColumns(10);
-		txtDependencia.setBounds(318, 76, 234, 23);
 		pnlDependencias.add(txtDependencia);
 		
 		JLabel lblOm = new JLabel("OM:");
-		lblOm.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		lblOm.setBounds(285, 111, 25, 15);
+		lblOm.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		pnlDependencias.add(lblOm);
 		
 		txtOM = new JTextField();
+		txtOM.setBounds(318, 107, 234, 23);
 		txtOM.setEnabled(false);
 		txtOM.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		txtOM.setColumns(10);
-		txtOM.setBounds(318, 107, 234, 23);
 		pnlDependencias.add(txtOM);
 		
 		JLabel lblContato = new JLabel("Contato:");
-		lblContato.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		lblContato.setBounds(257, 141, 53, 15);
+		lblContato.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		pnlDependencias.add(lblContato);
 		
 		JLabel lblTitleDepndcia = new JLabel("Cadastro de Dependências");
-		lblTitleDepndcia.setFont(new Font("Liberation Sans", Font.BOLD, 24));
 		lblTitleDepndcia.setBounds(266, 12, 319, 37);
+		lblTitleDepndcia.setFont(new Font("Liberation Sans", Font.BOLD, 24));
 		pnlDependencias.add(lblTitleDepndcia);
 		
-		table_1 = new JTable();
-		table_1.setBounds(12, 197, 843, 186);
-		pnlDependencias.add(table_1);
-		
 		JButton btnAddDpdncia = new JButton("   Incluir");
+		btnAddDpdncia.setBounds(12, 22, 109, 27);
 		btnAddDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnAddDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
 		btnAddDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/plus(1).png")));
@@ -312,10 +339,10 @@ public class Interface {
 				btnRmvDpdncia.setEnabled(false);
 			}
 		});
-		btnAddDpdncia.setBounds(12, 22, 109, 27);
 		pnlDependencias.add(btnAddDpdncia);
 		
 		btnAlterDpdncia = new JButton("  Alterar");
+		btnAlterDpdncia.setBounds(12, 80, 109, 27);
 		btnAlterDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnAlterDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
 		btnAlterDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/edit.png")));
@@ -335,10 +362,10 @@ public class Interface {
 				}
 			}
 		});
-		btnAlterDpdncia.setBounds(12, 80, 109, 27);
 		pnlDependencias.add(btnAlterDpdncia);
 		
 		btnRmvDpdncia = new JButton(" Remover");
+		btnRmvDpdncia.setBounds(12, 136, 109, 27);
 		btnRmvDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnRmvDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
 		btnRmvDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/remove(1).png")));
@@ -351,25 +378,25 @@ public class Interface {
 				}
 			}
 		});
-		btnRmvDpdncia.setBounds(12, 136, 109, 27);
 		pnlDependencias.add(btnRmvDpdncia);
 		
 		txtContato = new JTextField();
+		txtContato.setBounds(318, 138, 234, 23);
 		txtContato.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		txtContato.setEnabled(false);
 		txtContato.setColumns(10);
-		txtContato.setBounds(318, 138, 234, 23);
 		pnlDependencias.add(txtContato);
 		
 		btnSaveDpdncia = new JButton("  Salvar");
+		btnSaveDpdncia.setBounds(641, 77, 109, 27);
 		btnSaveDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnSaveDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
 		btnSaveDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/check(1).png")));
 		btnSaveDpdncia.setEnabled(false);
-		btnSaveDpdncia.setBounds(641, 77, 109, 27);
 		pnlDependencias.add(btnSaveDpdncia);
 		
 		btnCancelDpdncia = new JButton(" Cancelar");
+		btnCancelDpdncia.setBounds(641, 136, 109, 27);
 		btnCancelDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnCancelDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
 		btnCancelDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/remove.png")));
@@ -392,8 +419,37 @@ public class Interface {
 			}
 		});
 		btnCancelDpdncia.setEnabled(false);
-		btnCancelDpdncia.setBounds(641, 136, 109, 27);
 		pnlDependencias.add(btnCancelDpdncia);
+		
+		scrlpDependecia = new JScrollPane();
+		scrlpDependecia.setBounds(12, 201, 841, 195);
+		pnlDependencias.add(scrlpDependecia);
+		
+		tblDependencia = new JTable();
+		tblDependencia.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"ID", "Depend\u00EAncia", "Sigla", "OM", "Contato"
+			}
+		) {
+			boolean[] columnEditables = new boolean[] {
+				true, false, false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
+		tblDependencia.getColumnModel().getColumn(0).setPreferredWidth(62);
+		tblDependencia.getColumnModel().getColumn(1).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(1).setPreferredWidth(192);
+		tblDependencia.getColumnModel().getColumn(2).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(2).setPreferredWidth(94);
+		tblDependencia.getColumnModel().getColumn(3).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(3).setPreferredWidth(189);
+		tblDependencia.getColumnModel().getColumn(4).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(4).setPreferredWidth(103);
+		scrlpDependecia.setViewportView(tblDependencia);
 		
 		Panel pnlProtocolos = new Panel();
 		pnlProtocolos.setLayout(null);
@@ -432,10 +488,6 @@ public class Interface {
 		lblProtocolosDeSindicncia.setFont(new Font("Liberation Sans", Font.BOLD, 24));
 		lblProtocolosDeSindicncia.setBounds(268, 12, 309, 37);
 		pnlProtocolos.add(lblProtocolosDeSindicncia);
-		
-		table = new JTable();
-		table.setBounds(12, 249, 843, 134);
-		pnlProtocolos.add(table);
 		
 		cbxSindicado = new JComboBox();
 		cbxSindicado.setEnabled(false);
@@ -603,5 +655,38 @@ public class Interface {
 		btnCancelPtrclo.setEnabled(false);
 		btnCancelPtrclo.setBounds(651, 155, 110, 27);
 		pnlProtocolos.add(btnCancelPtrclo);
+		
+		JScrollPane scrlpProtocolo = new JScrollPane();
+		scrlpProtocolo.setBounds(12, 249, 841, 159);
+		pnlProtocolos.add(scrlpProtocolo);
+		
+		table = new JTable();
+		table.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"ID", "DIEX", "Sindicante", "Sindicado", "Data", "Caixa"
+			}
+		) {
+			boolean[] columnEditables = new boolean[] {
+				false, false, false, false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
+		table.getColumnModel().getColumn(0).setResizable(false);
+		table.getColumnModel().getColumn(0).setPreferredWidth(61);
+		table.getColumnModel().getColumn(1).setResizable(false);
+		table.getColumnModel().getColumn(1).setPreferredWidth(78);
+		table.getColumnModel().getColumn(2).setResizable(false);
+		table.getColumnModel().getColumn(2).setPreferredWidth(167);
+		table.getColumnModel().getColumn(3).setResizable(false);
+		table.getColumnModel().getColumn(3).setPreferredWidth(174);
+		table.getColumnModel().getColumn(4).setResizable(false);
+		table.getColumnModel().getColumn(4).setPreferredWidth(101);
+		table.getColumnModel().getColumn(5).setResizable(false);
+		table.getColumnModel().getColumn(5).setPreferredWidth(63);
+		scrlpProtocolo.setViewportView(table);
 	}
 }

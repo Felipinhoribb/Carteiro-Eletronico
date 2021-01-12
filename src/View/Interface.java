@@ -63,6 +63,8 @@ public class Interface {
 	private JScrollPane scrlpDependecia;
 	
 	private JTextField txtNumMessage, txtRemetente, txtDestinatario, txtCidade;
+	private JTable table_1;
+	private JTextField textField;
 
 	/**
 	 * Launch the application.
@@ -1045,6 +1047,37 @@ public class Interface {
 		scrlpMessage.setBounds(12, 345, 841, 180);
 		pnlCorrespondencia.add(scrlpMessage);
 		
+		table_1 = new JTable();
+		table_1.setModel(new DefaultTableModel(
+			new Object[][] {
+			},
+			new String[] {
+				"ID", "Documento", "N\u00BA", "Remetente", "Destinat\u00E1rio", "Data", "Envio"
+			}
+		) {
+			boolean[] columnEditables = new boolean[] {
+				false, false, false, false, false, false, false
+			};
+			public boolean isCellEditable(int row, int column) {
+				return columnEditables[column];
+			}
+		});
+		table_1.getColumnModel().getColumn(0).setResizable(false);
+		table_1.getColumnModel().getColumn(0).setPreferredWidth(42);
+		table_1.getColumnModel().getColumn(1).setResizable(false);
+		table_1.getColumnModel().getColumn(1).setPreferredWidth(88);
+		table_1.getColumnModel().getColumn(2).setResizable(false);
+		table_1.getColumnModel().getColumn(2).setPreferredWidth(45);
+		table_1.getColumnModel().getColumn(3).setResizable(false);
+		table_1.getColumnModel().getColumn(3).setPreferredWidth(177);
+		table_1.getColumnModel().getColumn(4).setResizable(false);
+		table_1.getColumnModel().getColumn(4).setPreferredWidth(170);
+		table_1.getColumnModel().getColumn(5).setResizable(false);
+		table_1.getColumnModel().getColumn(5).setPreferredWidth(74);
+		table_1.getColumnModel().getColumn(6).setResizable(false);
+		table_1.getColumnModel().getColumn(6).setPreferredWidth(47);
+		scrlpMessage.setViewportView(table_1);
+		
 		rdbDiexMessage = new JRadioButton("DIEX");
 		rdbDiexMessage.addMouseListener(new MouseAdapter() {
 			@Override
@@ -1217,5 +1250,17 @@ public class Interface {
 		dcEncaminhamento.setBounds(465, 92, 147, 23);
 		pnlCorrespondencia.add(dcEncaminhamento);
 		dcEncaminhamento.setEnabled(false);
+		
+		JLabel lblNmeroDeRastreio = new JLabel("Número de Rastreio:");
+		lblNmeroDeRastreio.setFont(new Font("Liberation Sans", Font.BOLD, 13));
+		lblNmeroDeRastreio.setBounds(178, 279, 130, 15);
+		pnlCorrespondencia.add(lblNmeroDeRastreio);
+		
+		textField = new JTextField();
+		textField.setFont(new Font("Liberation Sans", Font.BOLD, 13));
+		textField.setEnabled(false);
+		textField.setColumns(10);
+		textField.setBounds(316, 276, 234, 23);
+		pnlCorrespondencia.add(textField);
 	}
 }

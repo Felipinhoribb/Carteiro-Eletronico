@@ -7,7 +7,7 @@ public class Sindicancia {
 	private int idSindicancia;
 	private int idDocumento;
 	private int numDiex;
-	private int idMilitar;
+	private int sindicante;
 	private String sindicado;
 	private Date data_sindicancia;
 	private int caixa;
@@ -40,12 +40,12 @@ public class Sindicancia {
 		this.numDiex = numDiex;
 	}
 
-	public int getIdMilitar() {
-		return idMilitar;
+	public int getSindicante() {
+		return sindicante;
 	}
 
-	public void setIdMilitar(int idMilitar) {
-		this.idMilitar = idMilitar;
+	public void setSindicante(int sindicante) {
+		this.sindicante = sindicante;
 	}
 
 	public String getSindicado() {
@@ -72,10 +72,11 @@ public class Sindicancia {
 		this.caixa = caixa;
 	}
 
+	
 	@Override
 	public String toString() {
 		return "Sindicancia [idSindicancia=" + idSindicancia + ", idDocumento=" + idDocumento + ", numDiex=" + numDiex
-				+ ", idMilitar=" + idMilitar + ", sindicado=" + sindicado + ", data_sindicancia=" + data_sindicancia
+				+ ", sindicante=" + sindicante + ", sindicado=" + sindicado + ", data_sindicancia=" + data_sindicancia
 				+ ", caixa=" + caixa + "]";
 	}
 

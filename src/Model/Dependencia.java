@@ -45,8 +45,11 @@ public class Dependencia {
 
 	@Override
 	public String toString() {
-		return "Dependencia [idDependencia=" + idDependencia + ", nomeDependencia=" + nomeDependencia
-				+ ", omDependencia=" + omDependencia + ", contatoDependencia=" + contatoDependencia + "]";
+		
+		return nomeDependencia;
+		
+		/*return "Dependencia [idDependencia=" + idDependencia + ", nomeDependencia=" + nomeDependencia
+				+ ", omDependencia=" + omDependencia + ", contatoDependencia=" + contatoDependencia + "]";*/
 	}
 
 	

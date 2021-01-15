@@ -33,8 +33,13 @@ import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
+
+import Controller.DependenciaDAO;
+import Model.Dependencia;
 
 public class Interface {
 
@@ -54,7 +59,7 @@ public class Interface {
 	
 	JDateChooser dcEncaminhamento, dcSindicancia;
 	
-	private JComboBox cbxDependencia, cbxSindicante, cbxSindicado, cbxGraduacao, cbxEstado, cbxProtocolista;
+	private JComboBox<Dependencia> cbxDependencia, cbxSindicante, cbxSindicado, cbxGraduacao, cbxEstado, cbxProtocolista;
 	 
 	private JRadioButton rdbDiex, rdbNud, rdbDiexMessage, rdbOficio, rdbNudMessage;
 	
@@ -95,6 +100,16 @@ public class Interface {
 	 */
 	public Interface() {
 		initialize();
+		
+		DependenciaDAO dao = new DependenciaDAO();
+		ArrayList<Dependencia> listaDependencia = new ArrayList<Dependencia>();
+		listaDependencia = (ArrayList<Dependencia>) dao.listar();
+		
+		cbxDependencia.removeAll();
+		
+		for (Dependencia d : listaDependencia) {
+			cbxDependencia.addItem(d);
+		}
 	}
 
 	/**
@@ -163,6 +178,7 @@ public class Interface {
 		pnlMilitares.add(lblTitleMil);
 		
 		cbxDependencia = new JComboBox();
+		cbxDependencia.setModel(new DefaultComboBoxModel(new String[] {"Selecione a dependência"}));
 		cbxDependencia.setBounds(316, 166, 234, 23);
 		cbxDependencia.setEnabled(false);
 		pnlMilitares.add(cbxDependencia);
@@ -464,6 +480,18 @@ public class Interface {
 		pnlDependencias.add(txtContato);
 		
 		btnSaveDpdncia = new JButton("  Salvar");
+		btnSaveDpdncia.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				
+				Dependencia modelDep = new Dependencia();
+				modelDep.setNomeDependencia(txtDependencia.getText());
+				modelDep.setOmDependencia(txtOM.getText());
+				modelDep.setContatoDependencia(txtContato.getText());
+				
+				DependenciaDAO depDAO = new DependenciaDAO();
+				depDAO.salvarDependencia(modelDep);
+			}
+		});
 		btnSaveDpdncia.setBounds(641, 77, 109, 27);
 		btnSaveDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnSaveDpdncia.setHorizontalAlignment(SwingConstants.LEFT);

@@ -17,14 +17,14 @@ public class MilitarDAO {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public void adicionar(Militar mil) {
+	public void salvarMilitar(Militar mil) {
 		
 		Connection conn = Conexao.getConnection();
 		PreparedStatement pstm = null;
 		
 		try {
 			
-			String sql = "INSERT INTO Militar (nome_guerra, identidade, fk_graduacao, fk_dependencia) values (?, ?);";
+			String sql = "INSERT INTO Militar (nome_guerra, identidade, fk_graduacao, fk_dependencia) values (?, ?, ?, ?);";
 			pstm = conn.prepareStatement(sql);
 			
 			pstm.setString(1, mil.getNomeGuerra());

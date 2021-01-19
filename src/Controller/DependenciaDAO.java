@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 
 import Connection.Conexao;
 import Model.Dependencia;
+import Model.Graduacao;
 
 public class DependenciaDAO {
 
@@ -28,12 +29,13 @@ public class DependenciaDAO {
 		// Inserção de dados na tabela Dependencia
 		try {
 
-			String sql = "INSERT INTO Dependencia (nome_dependencia, om_dependencia, contato_dependencia) values (?, ?, ?);";
+			String sql = "INSERT INTO Dependencia (nome_dependencia, sigla_dependencia, om_dependencia, contato_dependencia) values (?, ?, ?, ?);";
 			pstm = conn.prepareStatement(sql);
 
 			pstm.setString(1, dep.getNomeDependencia());
-			pstm.setString(2, dep.getOmDependencia());
-			pstm.setString(3, dep.getContatoDependencia());
+			pstm.setString(2, dep.getSiglaDependencia());
+			pstm.setString(3, dep.getOmDependencia());
+			pstm.setString(4, dep.getContatoDependencia());
 			pstm.execute();
 
 			JOptionPane.showMessageDialog(null, "Dependência salva com sucesso!", "Sucesso",
@@ -129,4 +131,5 @@ public class DependenciaDAO {
 
 		return listaDependencia;
 	}
+
 }

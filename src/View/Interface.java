@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
+import javax.swing.JOptionPane;
 import javax.swing.JMenu;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -33,13 +34,22 @@ import java.awt.event.ActionEvent;
 import javax.swing.JScrollPane;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
 
+import Connection.Conexao;
 import Controller.DependenciaDAO;
+import Controller.MilitarDAO;
 import Model.Dependencia;
+import Model.Graduacao;
+import Model.Militar;
+import javax.swing.ScrollPaneConstants;
 
 public class Interface {
 
@@ -59,7 +69,7 @@ public class Interface {
 	
 	JDateChooser dcEncaminhamento, dcSindicancia;
 	
-	private JComboBox<Dependencia> cbxDependencia, cbxSindicante, cbxSindicado, cbxGraduacao, cbxEstado, cbxProtocolista;
+	private JComboBox<Object> cbxDependencia, cbxGraduacao, cbxSindicante, cbxSindicado, cbxEstado, cbxProtocolista;
 	 
 	private JRadioButton rdbDiex, rdbNud, rdbDiexMessage, rdbOficio, rdbNudMessage;
 	
@@ -70,6 +80,8 @@ public class Interface {
 	private JTextField txtNumMessage, txtRemetente, txtDestinatario, txtCidade;
 	private JTable table_1;
 	private JTextField textField;
+	private JTextField txtSigla;
+	private JLabel lblSigla;
 
 	/**
 	 * Launch the application.
@@ -101,15 +113,30 @@ public class Interface {
 	public Interface() {
 		initialize();
 		
-		DependenciaDAO dao = new DependenciaDAO();
+		//Listagem dos campos Dependencia e Graduação dos Combobox
+		DependenciaDAO daoDep = new DependenciaDAO();
+		MilitarDAO daoMil = new MilitarDAO();
+		
 		ArrayList<Dependencia> listaDependencia = new ArrayList<Dependencia>();
-		listaDependencia = (ArrayList<Dependencia>) dao.listar();
+		ArrayList<Graduacao> listaGraduacao = new ArrayList<Graduacao>();
+		
+		listaDependencia = (ArrayList<Dependencia>) daoDep.listar();
+		listaGraduacao = (ArrayList<Graduacao>) daoMil.listarGraduacao();
 		
 		cbxDependencia.removeAll();
 		
 		for (Dependencia d : listaDependencia) {
 			cbxDependencia.addItem(d);
 		}
+		
+		cbxGraduacao.removeAll();
+		
+		for (Graduacao g : listaGraduacao) {
+			cbxGraduacao.addItem(g);
+		}
+		
+		carregarTabelaDependencia();
+		carregarTabelaMilitar();
 	}
 
 	/**
@@ -163,6 +190,7 @@ public class Interface {
 		pnlMilitares.add(lblGraduacao);
 		
 		cbxGraduacao = new JComboBox();
+		cbxGraduacao.setModel(new DefaultComboBoxModel(new String[] {"Selecione a graduação"}));
 		cbxGraduacao.setBounds(316, 133, 234, 23);
 		cbxGraduacao.setEnabled(false);
 		pnlMilitares.add(cbxGraduacao);
@@ -246,6 +274,20 @@ public class Interface {
 		pnlMilitares.add(btnRmvMil);
 		
 		btnSaveMil = new JButton("  Salvar");
+		btnSaveMil.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Militar modelMil = new Militar();
+				
+				modelMil.setNomeGuerra(txtNomeGuerra.getText());
+				modelMil.setIdentidade(Integer.parseInt(txtIdentidade.getText()));
+				modelMil.setGraduacao(cbxGraduacao.getSelectedIndex());
+				modelMil.setDependencia(cbxDependencia.getSelectedIndex());
+				
+				MilitarDAO milDAO = new MilitarDAO();
+				milDAO.salvarMilitar(modelMil);
+				carregarTabelaMilitar();
+			}
+		});
 		btnSaveMil.setHorizontalAlignment(SwingConstants.LEFT);
 		btnSaveMil.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnSaveMil.setIcon(new ImageIcon(Interface.class.getResource("/img/check(1).png")));
@@ -266,6 +308,7 @@ public class Interface {
 				//esvazia os campos
 				txtNomeGuerra.setText("");
 				txtIdentidade.setText("");
+				txtSigla.setText("");
 				cbxGraduacao.setSelectedIndex(-1);
 				cbxDependencia.setSelectedIndex(-1);
 				
@@ -278,6 +321,7 @@ public class Interface {
 				btnSrchMil.setEnabled(true);
 				txtNomeGuerra.setEnabled(false);
 				txtIdentidade.setEnabled(false);
+				
 				cbxGraduacao.setEnabled(false);
 				cbxDependencia.setEnabled(false);
 			}
@@ -286,10 +330,27 @@ public class Interface {
 		pnlMilitares.add(btnCancelMil);
 		
 		JScrollPane scrlpMil = new JScrollPane();
+		scrlpMil.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrlpMil.setBounds(12, 272, 841, 253);
 		pnlMilitares.add(scrlpMil);
 		
 		tblMil = new JTable();
+		tblMil.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Militar modelMil = new Militar();
+				MilitarDAO milDAO = new MilitarDAO();
+				
+				int linha = tblMil.getSelectedRow();
+				
+				modelMil = milDAO.listar().get(linha);
+				
+				txtNomeGuerra.setText(modelMil.getNomeGuerra());
+				txtIdentidade.setText(String.valueOf(modelMil.getIdentidade()));
+				cbxGraduacao.setSelectedIndex(modelMil.getGraduacao());
+				cbxDependencia.setSelectedIndex(modelMil.getDependencia());
+			}
+		});
 		tblMil.setModel(new DefaultTableModel(
 			new Object[][] {
 			},
@@ -305,6 +366,7 @@ public class Interface {
 			}
 		});
 		tblMil.getColumnModel().getColumn(0).setResizable(false);
+		tblMil.getColumnModel().getColumn(0).setPreferredWidth(52);
 		tblMil.getColumnModel().getColumn(1).setResizable(false);
 		tblMil.getColumnModel().getColumn(1).setPreferredWidth(171);
 		tblMil.getColumnModel().getColumn(2).setResizable(false);
@@ -312,7 +374,7 @@ public class Interface {
 		tblMil.getColumnModel().getColumn(3).setResizable(false);
 		tblMil.getColumnModel().getColumn(3).setPreferredWidth(99);
 		tblMil.getColumnModel().getColumn(4).setResizable(false);
-		tblMil.getColumnModel().getColumn(4).setPreferredWidth(108);
+		tblMil.getColumnModel().getColumn(4).setPreferredWidth(198);
 		scrlpMil.setViewportView(tblMil);
 		
 		lblPesqMil = new JLabel("Pesquisa:");
@@ -392,19 +454,19 @@ public class Interface {
 		pnlDependencias.add(txtDependencia);
 		
 		JLabel lblOm = new JLabel("OM:");
-		lblOm.setBounds(285, 111, 25, 15);
+		lblOm.setBounds(285, 140, 25, 15);
 		lblOm.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		pnlDependencias.add(lblOm);
 		
 		txtOM = new JTextField();
-		txtOM.setBounds(318, 107, 234, 23);
+		txtOM.setBounds(318, 136, 234, 23);
 		txtOM.setEnabled(false);
 		txtOM.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		txtOM.setColumns(10);
 		pnlDependencias.add(txtOM);
 		
 		JLabel lblContato = new JLabel("Contato:");
-		lblContato.setBounds(257, 141, 53, 15);
+		lblContato.setBounds(257, 170, 53, 15);
 		lblContato.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		pnlDependencias.add(lblContato);
 		
@@ -421,6 +483,7 @@ public class Interface {
 		btnAddDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				txtDependencia.setEnabled(true);
+				txtSigla.setEnabled(true);
 				txtOM.setEnabled(true);
 				txtContato.setEnabled(true);
 				btnSaveDpdncia.setEnabled(true);
@@ -444,6 +507,7 @@ public class Interface {
 					System.out.println("Selecione um registro!");
 				} else {
 					txtDependencia.setEnabled(true);
+					txtSigla.setEnabled(true);
 					txtOM.setEnabled(true);
 					txtContato.setEnabled(true);
 					btnSaveDpdncia.setEnabled(true);
@@ -473,7 +537,7 @@ public class Interface {
 		pnlDependencias.add(btnRmvDpdncia);
 		
 		txtContato = new JTextField();
-		txtContato.setBounds(318, 138, 234, 23);
+		txtContato.setBounds(318, 167, 234, 23);
 		txtContato.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		txtContato.setEnabled(false);
 		txtContato.setColumns(10);
@@ -485,11 +549,13 @@ public class Interface {
 				
 				Dependencia modelDep = new Dependencia();
 				modelDep.setNomeDependencia(txtDependencia.getText());
+				modelDep.setSiglaDependencia(txtSigla.getText());
 				modelDep.setOmDependencia(txtOM.getText());
 				modelDep.setContatoDependencia(txtContato.getText());
 				
 				DependenciaDAO depDAO = new DependenciaDAO();
 				depDAO.salvarDependencia(modelDep);
+				carregarTabelaDependencia();
 			}
 		});
 		btnSaveDpdncia.setBounds(641, 77, 109, 27);
@@ -519,6 +585,7 @@ public class Interface {
 				btnRmvDpdncia.setEnabled(true);
 				btnSrchDpdncia.setEnabled(true);
 				txtDependencia.setEnabled(false);
+				txtSigla.setEnabled(false);
 				txtOM.setEnabled(false);
 				txtContato.setEnabled(false);
 			}
@@ -539,21 +606,12 @@ public class Interface {
 			}
 		) {
 			boolean[] columnEditables = new boolean[] {
-				true, false, false, false, false
+				false, false, false, false, false
 			};
 			public boolean isCellEditable(int row, int column) {
 				return columnEditables[column];
 			}
 		});
-		tblDependencia.getColumnModel().getColumn(0).setPreferredWidth(62);
-		tblDependencia.getColumnModel().getColumn(1).setResizable(false);
-		tblDependencia.getColumnModel().getColumn(1).setPreferredWidth(192);
-		tblDependencia.getColumnModel().getColumn(2).setResizable(false);
-		tblDependencia.getColumnModel().getColumn(2).setPreferredWidth(94);
-		tblDependencia.getColumnModel().getColumn(3).setResizable(false);
-		tblDependencia.getColumnModel().getColumn(3).setPreferredWidth(189);
-		tblDependencia.getColumnModel().getColumn(4).setResizable(false);
-		tblDependencia.getColumnModel().getColumn(4).setPreferredWidth(103);
 		scrlpDependecia.setViewportView(tblDependencia);
 		
 		lblPesqDpdncia = new JLabel("Pesquisar:");
@@ -613,6 +671,18 @@ public class Interface {
 		btnSrchDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
 		btnSrchDpdncia.setBounds(12, 136, 109, 27);
 		pnlDependencias.add(btnSrchDpdncia);
+		
+		txtSigla = new JTextField();
+		txtSigla.setFont(new Font("Liberation Sans", Font.BOLD, 13));
+		txtSigla.setEnabled(false);
+		txtSigla.setColumns(10);
+		txtSigla.setBounds(318, 107, 234, 23);
+		pnlDependencias.add(txtSigla);
+		
+		lblSigla = new JLabel("Sigla da Dependência:");
+		lblSigla.setFont(new Font("Liberation Sans", Font.BOLD, 13));
+		lblSigla.setBounds(161, 111, 149, 15);
+		pnlDependencias.add(lblSigla);
 		
 		Panel pnlProtocolos = new Panel();
 		pnlProtocolos.setLayout(null);
@@ -1291,4 +1361,113 @@ public class Interface {
 		textField.setBounds(316, 276, 234, 23);
 		pnlCorrespondencia.add(textField);
 	}
+	
+	//Método que carrega a Lista de Dependências na tabela
+	private void carregarTabelaDependencia() {
+		
+		DefaultTableModel modelo = (DefaultTableModel) tblDependencia.getModel();
+		modelo.setNumRows(0);
+		
+		tblDependencia.getColumnModel().getColumn(0).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(0).setPreferredWidth(62);
+		tblDependencia.getColumnModel().getColumn(1).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(1).setPreferredWidth(228);
+		tblDependencia.getColumnModel().getColumn(2).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(2).setPreferredWidth(94);
+		tblDependencia.getColumnModel().getColumn(3).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(3).setPreferredWidth(157);
+		tblDependencia.getColumnModel().getColumn(4).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(4).setPreferredWidth(103);
+		
+		 DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer(); 
+		 centerRenderer.setHorizontalAlignment( JLabel.CENTER ); 
+		 tblDependencia.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
+		 tblDependencia.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
+		 tblDependencia.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
+		 tblDependencia.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
+		 tblDependencia.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
+		
+		try {
+			
+			Connection conn = Conexao.getConnection();
+			PreparedStatement pstm = null;
+			ResultSet rs;
+			
+			String sql = "SELECT * FROM Dependencia;";	
+			pstm = conn.prepareStatement(sql);
+			rs = pstm.executeQuery();
+			
+			while (rs.next()) {
+				modelo.addRow(new Object[] {
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5)
+				});
+			}
+			
+			Conexao.closeConnection(conn, (com.mysql.jdbc.PreparedStatement) pstm, rs);
+			
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, "Erro ao carregar Tabela! " + ex, "Erro", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	//Método que carrega a Lista de Militar na tabela
+	private void carregarTabelaMilitar() {
+		
+		DefaultTableModel modelo = (DefaultTableModel) tblMil.getModel();
+		modelo.setNumRows(0);
+		
+		tblMil.getColumnModel().getColumn(0).setResizable(false);
+		tblMil.getColumnModel().getColumn(0).setPreferredWidth(52);
+		tblMil.getColumnModel().getColumn(1).setResizable(false);
+		tblMil.getColumnModel().getColumn(1).setPreferredWidth(171);
+		tblMil.getColumnModel().getColumn(2).setResizable(false);
+		tblMil.getColumnModel().getColumn(2).setPreferredWidth(123);
+		tblMil.getColumnModel().getColumn(3).setResizable(false);
+		tblMil.getColumnModel().getColumn(3).setPreferredWidth(99);
+		tblMil.getColumnModel().getColumn(4).setResizable(false);
+		tblMil.getColumnModel().getColumn(4).setPreferredWidth(198);
+		
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer(); 
+		 centerRenderer.setHorizontalAlignment( JLabel.CENTER ); 
+		 tblMil.getColumnModel().getColumn(0).setCellRenderer( centerRenderer );
+		 tblMil.getColumnModel().getColumn(1).setCellRenderer( centerRenderer );
+		 tblMil.getColumnModel().getColumn(2).setCellRenderer( centerRenderer );
+		 tblMil.getColumnModel().getColumn(3).setCellRenderer( centerRenderer );
+		 tblMil.getColumnModel().getColumn(4).setCellRenderer( centerRenderer );
+		
+		try {
+			
+			Connection conn = Conexao.getConnection();
+			PreparedStatement pstm = null;
+			ResultSet rs = null;
+			
+			String sql = "SELECT Militar.id_militar, Militar.nome_guerra, Militar.identidade, Graduacao.descricao, Dependencia.nome_dependencia FROM db_postman.Militar \n" + 
+					"INNER JOIN db_postman.Graduacao ON Militar.fk_graduacao = Graduacao.id_graduacao\n" + 
+					"INNER JOIN db_postman.Dependencia ON Militar.fk_dependencia = Dependencia.id_dependencia;";
+			pstm = conn.prepareStatement(sql);
+			rs = pstm.executeQuery();
+			
+			while (rs.next()) {
+				
+				modelo.addRow(new Object[] {
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getInt(3),
+						rs.getString(4),
+						rs.getString(5)
+				});
+			}
+			
+			Conexao.closeConnection(conn, (com.mysql.jdbc.PreparedStatement) pstm, rs);
+			
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, "Erro ao carregar Tabela Militar! " + ex, "Erro", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	
 }

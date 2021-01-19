@@ -19,7 +19,7 @@ public class DependenciaDAO {
 		// TODO Auto-generated constructor stub
 	}
 
-	// Método para salvar dependências
+	// Método para salvar Dependências
 	public void salvarDependencia(Dependencia dep) {
 
 		// Abertura de conexão com o banco de dados
@@ -49,7 +49,7 @@ public class DependenciaDAO {
 
 	}
 
-	// Método para alterar dependências
+	// Método para alterar Dependências
 	public void alterarDependencia(Dependencia dep) {
 
 		// Abertura de conexão com o banco de dados
@@ -77,7 +77,8 @@ public class DependenciaDAO {
 			Conexao.closeConnection(conn, (com.mysql.jdbc.PreparedStatement) pstm);
 		}
 	}
-
+	
+	//Método para excluir Dependências
 	public void excluirDependencia(Dependencia dep) {
 		Connection conn = Conexao.getConnection();
 		PreparedStatement pstm = null;

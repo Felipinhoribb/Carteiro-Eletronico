@@ -58,21 +58,22 @@ public class DependenciaDAO {
 
 		// Alteração de dados na tabela dependência
 		try {
-			String sql = "UPDATE Dependencia SET nome_dependencia = '?', om_dependencia = '?', contato_dependencia = '?'"
+			String sql = "UPDATE Dependencia SET nome_dependencia = ?, sigla_dependencia = ?, om_dependencia = ?, contato_dependencia = ?"
 					+ "WHERE id_dependencia = ?;";
 			pstm = conn.prepareStatement(sql);
 
 			pstm.setString(1, dep.getNomeDependencia());
-			pstm.setString(2, dep.getOmDependencia());
-			pstm.setString(3, dep.getContatoDependencia());
-			pstm.setInt(4, dep.getIdDependencia());
+			pstm.setString(2, dep.getSiglaDependencia());
+			pstm.setString(3, dep.getOmDependencia());
+			pstm.setString(4, dep.getContatoDependencia());
+			pstm.setInt(5, dep.getIdDependencia());
 			pstm.executeUpdate();
 
 			JOptionPane.showMessageDialog(null, "Dependência Alterada com sucesso!", "Sucesso",
 					JOptionPane.INFORMATION_MESSAGE);
 
 		} catch (SQLException ex) {
-			JOptionPane.showMessageDialog(null, "Erro ao Alterar Dependência!", "Erro", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Erro ao Alterar Dependência!" + ex, "Erro", JOptionPane.ERROR_MESSAGE);
 		} finally {
 			Conexao.closeConnection(conn, (com.mysql.jdbc.PreparedStatement) pstm);
 		}
@@ -84,7 +85,7 @@ public class DependenciaDAO {
 		PreparedStatement pstm = null;
 
 		try {
-			String sql = "DELETE FROM Dependencia WHERE id_dependencia = ?";
+			String sql = "DELETE FROM Dependencia WHERE id_dependencia = ?;";
 			pstm = conn.prepareStatement(sql);
 
 			pstm.setInt(1, dep.getIdDependencia());
@@ -93,7 +94,9 @@ public class DependenciaDAO {
 			JOptionPane.showMessageDialog(null, "Dependência Removida com sucesso!", "Sucesso",
 					JOptionPane.INFORMATION_MESSAGE);
 		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(null, "Erro ao Remover Dependência!", "Erro", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Para remover esta dependência, "
+					+ "você deve primeiro, remover todos os Militares que estão "
+					+ "cadastrados na dependência atual!", "Informação", JOptionPane.ERROR_MESSAGE);
 		} finally {
 			Conexao.closeConnection(conn, (com.mysql.jdbc.PreparedStatement) pstm);
 		}
@@ -119,8 +122,9 @@ public class DependenciaDAO {
 				Dependencia dep = new Dependencia();
 				dep.setIdDependencia(rs.getInt(1));
 				dep.setNomeDependencia(rs.getString(2));
-				dep.setOmDependencia(rs.getString(3));
-				dep.setContatoDependencia(rs.getString(4));
+				dep.setSiglaDependencia(rs.getString(3));
+				dep.setOmDependencia(rs.getString(4));
+				dep.setContatoDependencia(rs.getString(5));
 
 				listaDependencia.add(dep);
 			}

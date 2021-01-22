@@ -4,14 +4,6 @@ public class Dependencia {
 
 	private int idDependencia;
 	private String siglaDependencia;
-	public String getSiglaDependencia() {
-		return siglaDependencia;
-	}
-
-	public void setSiglaDependencia(String siglaDependencia) {
-		this.siglaDependencia = siglaDependencia;
-	}
-
 	private String nomeDependencia;
 	private String omDependencia;
 	private String contatoDependencia;
@@ -34,6 +26,14 @@ public class Dependencia {
 
 	public void setNomeDependencia(String nomeDependencia) {
 		this.nomeDependencia = nomeDependencia;
+	}
+	
+	public String getSiglaDependencia() {
+		return siglaDependencia;
+	}
+
+	public void setSiglaDependencia(String siglaDependencia) {
+		this.siglaDependencia = siglaDependencia;
 	}
 
 	public String getOmDependencia() {

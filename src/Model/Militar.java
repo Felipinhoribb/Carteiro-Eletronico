@@ -55,8 +55,10 @@ public class Militar {
 	
 	@Override
 	public String toString() {
-		return "Militar [idMilitar=" + idMilitar + ", nomeGuerra=" + nomeGuerra + ", identidade=" + identidade
-				+ ", graduacao=" + graduacao + ", dependencia=" + dependencia + "]";
+		return nomeGuerra;
+				
+				/*"Militar [idMilitar=" + idMilitar + ", nomeGuerra=" + nomeGuerra + ", identidade=" + identidade
+				+ ", graduacao=" + graduacao + ", dependencia=" + dependencia + "]";*/
 	}
 	
 }

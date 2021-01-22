@@ -35,6 +35,7 @@ import javax.swing.JScrollPane;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -46,9 +47,12 @@ import com.toedter.calendar.JDateChooser;
 import Connection.Conexao;
 import Controller.DependenciaDAO;
 import Controller.MilitarDAO;
+import Controller.SindicanciaDAO;
 import Model.Dependencia;
 import Model.Graduacao;
 import Model.Militar;
+import Model.Sindicancia;
+
 import javax.swing.ScrollPaneConstants;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -63,16 +67,17 @@ public class Interface {
 
 	private JButton btnCancelMil, btnSaveMil, btnAlterMil, btnRmvMil, btnAlterDpdncia, btnRmvDpdncia, btnSaveDpdncia,
 			btnAddPrtclo, btnCancelDpdncia, btnAlterPrtclo, btnRmvPrtclo, btnSavePrtclo, btnCancelPtrclo,
-			btnCancelMessage, btnSaveMessage, btnCancelPesqMil, btnPesqDpdncia, btnCancPesqDpdncia,
-			btnPesqPtclo, btnCancelPesqPtclo, btnBuscarMessage, btnCancelPesqMessage, btnSrchMil, btnSrchDpdncia,
-			btnSrchPtclo, btnAlterMessage, btnRmvMessage, btnSrchMessage;
+			btnCancelMessage, btnSaveMessage, btnCancelPesqMil, btnCancPesqDpdncia, btnPesqPtclo, btnCancelPesqPtclo,
+			btnBuscarMessage, btnCancelPesqMessage, btnSrchMil, btnSrchDpdncia, btnSrchPtclo, btnAlterMessage,
+			btnRmvMessage, btnSrchMessage, btnAddMil, btnAddDpdncia;
 
 	private JLabel lblDependencia, lblTitleMil, lblNumDiex, lblEstado, lblTipoEnvio, lblCep, lblProtocolista,
 			lblPesqMil, lblPesqDpdncia, lblPesqPtclo, lblBuscarMessage, lblData;
 
 	JDateChooser dcEncaminhamento, dcSindicancia;
 
-	private JComboBox<Object> cbxDependencia, cbxGraduacao, cbxSindicante, cbxSindicado, cbxEstado, cbxProtocolista;
+	private JComboBox<Object> cbxDependencia, cbxGraduacao, cbxEstado, cbxProtocolista;
+	private JComboBox<Militar> cbxSindicante;
 
 	private JRadioButton rdbDiex, rdbNud, rdbDiexMessage, rdbOficio, rdbNudMessage;
 
@@ -87,6 +92,7 @@ public class Interface {
 	private JLabel lblSigla;
 
 	private boolean insert, update = false;
+	private JTextField txtSindicado;
 
 	/**
 	 * Launch the application.
@@ -126,11 +132,14 @@ public class Interface {
 		DependenciaDAO daoDep = new DependenciaDAO();
 		MilitarDAO daoMil = new MilitarDAO();
 
+
 		ArrayList<Dependencia> listaDependencia = new ArrayList<Dependencia>();
 		ArrayList<Graduacao> listaGraduacao = new ArrayList<Graduacao>();
+		ArrayList<Militar> listaMilitar = new ArrayList<Militar>();
 
 		listaDependencia = (ArrayList<Dependencia>) daoDep.listar();
 		listaGraduacao = (ArrayList<Graduacao>) daoMil.listarGraduacao();
+		listaMilitar = (ArrayList<Militar>) daoMil.listar();
 
 		cbxDependencia.removeAll();
 
@@ -142,6 +151,12 @@ public class Interface {
 
 		for (Graduacao g : listaGraduacao) {
 			cbxGraduacao.addItem(g);
+		}
+		
+		cbxSindicante.removeAll();
+
+		for (Militar m : listaMilitar) {
+			cbxSindicante.addItem(m);
 		}
 
 		carregarTabelaDependencia();
@@ -222,7 +237,7 @@ public class Interface {
 		cbxDependencia.setEnabled(false);
 		pnlMilitares.add(cbxDependencia);
 
-		JButton btnAddMil = new JButton("   Incluir");
+		btnAddMil = new JButton("   Incluir");
 		btnAddMil.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnAddMil.setHorizontalAlignment(SwingConstants.LEFT);
 		btnAddMil.setIcon(new ImageIcon(Interface.class.getResource("/img/plus(1).png")));
@@ -310,7 +325,13 @@ public class Interface {
 					objMil.setNomeGuerra(txtNomeGuerra.getText());
 					objMil.setIdentidade(Integer.parseInt(txtIdentidade.getText()));
 					objMil.setGraduacao(cbxGraduacao.getSelectedIndex());
-					objMil.setDependencia(cbxDependencia.getSelectedIndex());
+					
+					//Recuperação da Dependência escolhido pelo usuário
+					Dependencia objDependencia = new Dependencia();
+					objDependencia = (Dependencia) cbxDependencia.getSelectedItem();
+					int id = objDependencia.getIdDependencia();
+					
+					objMil.setDependencia(id);
 
 					milDAO.salvarMilitar(objMil);
 					carregarTabelaMilitar();
@@ -347,28 +368,7 @@ public class Interface {
 		btnCancelMil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
-				// esvazia os campos
-				txtNomeGuerra.setText("");
-				txtIdentidade.setText("");
-				txtSigla.setText("");
-				cbxGraduacao.setSelectedIndex(-1);
-				cbxDependencia.setSelectedIndex(-1);
-
-				// desabilita os campos e botões
-				btnSaveMil.setEnabled(false);
-				btnCancelMil.setEnabled(false);
-				btnAddMil.setEnabled(true);
-				btnAlterMil.setEnabled(true);
-				btnRmvMil.setEnabled(true);
-				btnSrchMil.setEnabled(true);
-				txtNomeGuerra.setEnabled(false);
-				txtIdentidade.setEnabled(false);
-
-				cbxGraduacao.setEnabled(false);
-				cbxDependencia.setEnabled(false);
-
-				insert = false;
-				update = false;
+				formatarCamposMilitares();
 			}
 		});
 		btnCancelMil.setEnabled(false);
@@ -426,7 +426,7 @@ public class Interface {
 		txtPesquisa.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyReleased(KeyEvent e) {
-				pesquisar(txtPesquisa.getText());
+				pesquisarMilitar(txtPesquisa.getText());
 			}
 		});
 		txtPesquisa.setVisible(false);
@@ -444,7 +444,7 @@ public class Interface {
 				btnAddMil.setEnabled(true);
 				btnAlterMil.setEnabled(true);
 				btnRmvMil.setEnabled(true);
-				
+
 				carregarTabelaMilitar();
 			}
 		});
@@ -512,7 +512,7 @@ public class Interface {
 		lblTitleDepndcia.setFont(new Font("Liberation Sans", Font.BOLD, 24));
 		pnlDependencias.add(lblTitleDepndcia);
 
-		JButton btnAddDpdncia = new JButton("   Incluir");
+		btnAddDpdncia = new JButton("   Incluir");
 		btnAddDpdncia.setBounds(12, 22, 109, 27);
 		btnAddDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnAddDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
@@ -528,6 +528,8 @@ public class Interface {
 				btnAlterDpdncia.setEnabled(false);
 				btnRmvDpdncia.setEnabled(false);
 				btnSrchDpdncia.setEnabled(false);
+
+				insert = true;
 			}
 		});
 		pnlDependencias.add(btnAddDpdncia);
@@ -540,8 +542,9 @@ public class Interface {
 		btnAlterDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// Verifica se o usuário selecionou algum registro da tabela
-				if (!txtDependencia.getText().isEmpty()) {
-					System.out.println("Selecione um registro!");
+				if (txtDependencia.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "Selecione a dependência que deseja alterar na tabela!",
+							"Informação", JOptionPane.INFORMATION_MESSAGE);
 				} else {
 					txtDependencia.setEnabled(true);
 					txtSigla.setEnabled(true);
@@ -552,6 +555,8 @@ public class Interface {
 					btnAddDpdncia.setEnabled(false);
 					btnRmvDpdncia.setEnabled(false);
 					btnSrchDpdncia.setEnabled(false);
+
+					update = true;
 				}
 			}
 		});
@@ -565,9 +570,17 @@ public class Interface {
 		btnRmvDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (txtDependencia.getText().isEmpty()) {
-					System.out.println("Selecione um registro para a remoção!");
+					JOptionPane.showMessageDialog(null, "Selecione a dependência que deseja alterar na tabela!",
+							"Informação", JOptionPane.INFORMATION_MESSAGE);
 				} else {
-					// Remove o registro
+
+					Dependencia objDep = new Dependencia();
+					DependenciaDAO depDAO = new DependenciaDAO();
+
+					int linha = tblDependencia.getSelectedRow();
+					objDep = depDAO.listar().get(linha);
+
+					depDAO.excluirDependencia(objDep);
 				}
 			}
 		});
@@ -584,18 +597,32 @@ public class Interface {
 		btnSaveDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
-				if (!txtNomeGuerra.getText().equals("")) {
+				Dependencia objDep = new Dependencia();
+				DependenciaDAO depDAO = new DependenciaDAO();
 
-					Dependencia objDep = new Dependencia();
+				if (insert) {
+
 					objDep.setNomeDependencia(txtDependencia.getText());
 					objDep.setSiglaDependencia(txtSigla.getText());
 					objDep.setOmDependencia(txtOM.getText());
 					objDep.setContatoDependencia(txtContato.getText());
 
-					DependenciaDAO depDAO = new DependenciaDAO();
 					depDAO.salvarDependencia(objDep);
-					carregarTabelaDependencia();
+
+				} else if (update) {
+
+					int linha = tblDependencia.getSelectedRow();
+					objDep = depDAO.listar().get(linha);
+
+					objDep.setNomeDependencia(txtDependencia.getText());
+					objDep.setSiglaDependencia(txtSigla.getText());
+					objDep.setOmDependencia(txtOM.getText());
+					objDep.setContatoDependencia(txtContato.getText());
+
+					depDAO.alterarDependencia(objDep);
 				}
+
+				carregarTabelaDependencia();
 			}
 		});
 		btnSaveDpdncia.setBounds(641, 77, 109, 27);
@@ -612,22 +639,8 @@ public class Interface {
 		btnCancelDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/remove.png")));
 		btnCancelDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				// esvazia os campos
-				txtDependencia.setText("");
-				txtOM.setText("");
-				txtContato.setText("");
 
-				// desabilita os campos e botões
-				btnSaveDpdncia.setEnabled(false);
-				btnCancelDpdncia.setEnabled(false);
-				btnAddDpdncia.setEnabled(true);
-				btnAlterDpdncia.setEnabled(true);
-				btnRmvDpdncia.setEnabled(true);
-				btnSrchDpdncia.setEnabled(true);
-				txtDependencia.setEnabled(false);
-				txtSigla.setEnabled(false);
-				txtOM.setEnabled(false);
-				txtContato.setEnabled(false);
+				formatarCamposDepndcia();
 			}
 		});
 		btnCancelDpdncia.setEnabled(false);
@@ -638,6 +651,22 @@ public class Interface {
 		pnlDependencias.add(scrlpDependecia);
 
 		tblDependencia = new JTable();
+		tblDependencia.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+				Dependencia objDep = new Dependencia();
+				DependenciaDAO depDAO = new DependenciaDAO();
+
+				int linha = tblDependencia.getSelectedRow();
+				objDep = depDAO.listar().get(linha);
+
+				txtDependencia.setText(objDep.getNomeDependencia());
+				txtSigla.setText(objDep.getSiglaDependencia());
+				txtOM.setText(objDep.getOmDependencia());
+				txtContato.setText(objDep.getContatoDependencia());
+			}
+		});
 		tblDependencia.setModel(new DefaultTableModel(new Object[][] {},
 				new String[] { "ID", "Depend\u00EAncia", "Sigla", "OM", "Contato" }) {
 			boolean[] columnEditables = new boolean[] { false, false, false, false, false };
@@ -655,26 +684,24 @@ public class Interface {
 		pnlDependencias.add(lblPesqDpdncia);
 
 		txtPesqDpdncia = new JTextField();
+		txtPesqDpdncia.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				
+				pesquisarDependencia(txtPesqDpdncia.getText());
+			}
+		});
 		txtPesqDpdncia.setVisible(false);
 		txtPesqDpdncia.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		txtPesqDpdncia.setColumns(10);
 		txtPesqDpdncia.setBounds(83, 213, 530, 23);
 		pnlDependencias.add(txtPesqDpdncia);
 
-		btnPesqDpdncia = new JButton(" Buscar");
-		btnPesqDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/lupa.png")));
-		btnPesqDpdncia.setVisible(false);
-		btnPesqDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
-		btnPesqDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
-		btnPesqDpdncia.setBounds(624, 210, 109, 27);
-		pnlDependencias.add(btnPesqDpdncia);
-
 		btnCancPesqDpdncia = new JButton("Cancelar");
 		btnCancPesqDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				lblPesqDpdncia.setVisible(false);
 				txtPesqDpdncia.setVisible(false);
-				btnPesqDpdncia.setVisible(false);
 				btnCancPesqDpdncia.setVisible(false);
 				btnAddDpdncia.setEnabled(true);
 				btnAlterDpdncia.setEnabled(true);
@@ -685,7 +712,7 @@ public class Interface {
 		btnCancPesqDpdncia.setVisible(false);
 		btnCancPesqDpdncia.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnCancPesqDpdncia.setHorizontalAlignment(SwingConstants.LEFT);
-		btnCancPesqDpdncia.setBounds(744, 210, 109, 27);
+		btnCancPesqDpdncia.setBounds(624, 210, 109, 27);
 		pnlDependencias.add(btnCancPesqDpdncia);
 
 		btnSrchDpdncia = new JButton(" Pesquisa");
@@ -693,7 +720,6 @@ public class Interface {
 			public void actionPerformed(ActionEvent arg0) {
 				lblPesqDpdncia.setVisible(true);
 				txtPesqDpdncia.setVisible(true);
-				btnPesqDpdncia.setVisible(true);
 				btnCancPesqDpdncia.setVisible(true);
 				btnAddDpdncia.setEnabled(false);
 				btnAlterDpdncia.setEnabled(false);
@@ -757,12 +783,8 @@ public class Interface {
 		lblProtocolosDeSindicncia.setBounds(268, 12, 309, 37);
 		pnlProtocolos.add(lblProtocolosDeSindicncia);
 
-		cbxSindicado = new JComboBox();
-		cbxSindicado.setEnabled(false);
-		cbxSindicado.setBounds(343, 155, 283, 23);
-		pnlProtocolos.add(cbxSindicado);
-
 		rdbDiex = new JRadioButton("DIEX");
+		rdbDiex.setEnabled(false);
 		rdbDiex.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -773,7 +795,6 @@ public class Interface {
 				lblNumDiex.setEnabled(true);
 			}
 		});
-		rdbDiex.setEnabled(false);
 		rdbDiex.setBounds(343, 61, 64, 23);
 		pnlProtocolos.add(rdbDiex);
 
@@ -807,7 +828,7 @@ public class Interface {
 		txtCaixa.setBounds(529, 187, 97, 23);
 		pnlProtocolos.add(txtCaixa);
 
-		JButton btnAddPrtclo = new JButton("   Incluir");
+		btnAddPrtclo = new JButton("   Incluir");
 		btnAddPrtclo.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnAddPrtclo.setHorizontalAlignment(SwingConstants.LEFT);
 		btnAddPrtclo.setIcon(new ImageIcon(Interface.class.getResource("/img/plus(1).png")));
@@ -816,7 +837,7 @@ public class Interface {
 				rdbDiex.setEnabled(true);
 				rdbNud.setEnabled(true);
 				cbxSindicante.setEnabled(true);
-				cbxSindicado.setEnabled(true);
+				txtSindicado.setEnabled(true);
 				dcSindicancia.setEnabled(true);
 				txtCaixa.setEnabled(true);
 				btnSavePrtclo.setEnabled(true);
@@ -825,6 +846,8 @@ public class Interface {
 				btnRmvPrtclo.setEnabled(false);
 				btnAlterPrtclo.setEnabled(false);
 				btnSrchPtclo.setEnabled(false);
+				
+				insert = true;
 			}
 		});
 		btnAddPrtclo.setBounds(12, 22, 110, 27);
@@ -843,7 +866,7 @@ public class Interface {
 					rdbDiex.setEnabled(true);
 					rdbNud.setEnabled(true);
 					cbxSindicante.setEnabled(true);
-					cbxSindicado.setEnabled(true);
+					txtSindicado.setEnabled(true);
 					dcSindicancia.setEnabled(true);
 					txtCaixa.setEnabled(true);
 					btnSavePrtclo.setEnabled(true);
@@ -851,6 +874,8 @@ public class Interface {
 					btnAddPrtclo.setEnabled(false);
 					btnRmvPrtclo.setEnabled(false);
 					btnSrchPtclo.setEnabled(false);
+					
+					update = true;
 				}
 			}
 		});
@@ -875,6 +900,48 @@ public class Interface {
 		pnlProtocolos.add(btnRmvPrtclo);
 
 		btnSavePrtclo = new JButton("  Salvar");
+		btnSavePrtclo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Sindicancia objSind = new Sindicancia();
+				SindicanciaDAO sindDAO = new SindicanciaDAO();
+				
+				if (insert) {
+
+					if (rdbDiex.isSelected()) {
+						objSind.setIdDocumento(1);
+					} else {
+						objSind.setIdDocumento(2);
+					}
+
+					objSind.setNumDiex(Integer.parseInt(txtNumDiex.getText()));
+					
+					//Recuperação do Sindicante escolhido pelo usuário
+					Militar objMilitar = new Militar();
+					objMilitar = (Militar) cbxSindicante.getSelectedItem();
+					int id = objMilitar.getIdMilitar();
+					
+					objSind.setSindicante(id);
+					objSind.setSindicado(txtSindicado.getText());
+					objSind.setData_sindicancia(dcSindicancia.getDate());
+					objSind.setCaixa(Integer.parseInt(txtCaixa.getText()));
+					
+					sindDAO.salvarSindicancia(objSind);
+
+				} else {
+
+					/*int linha = tblMil.getSelectedRow();
+					objSind = milDAO.listar().get(linha);
+
+					objSind.setNomeGuerra(txtNomeGuerra.getText());
+					objSind.setIdentidade(Integer.parseInt(txtIdentidade.getText()));
+					objSind.setGraduacao(cbxGraduacao.getSelectedIndex());
+					objSind.setDependencia(cbxDependencia.getSelectedIndex());
+
+					milDAO.alterarMilitar(objMil);
+					carregarTabelaMilitar();*/
+				}
+			}
+		});
 		btnSavePrtclo.setHorizontalTextPosition(SwingConstants.RIGHT);
 		btnSavePrtclo.setHorizontalAlignment(SwingConstants.LEFT);
 		btnSavePrtclo.setIcon(new ImageIcon(Interface.class.getResource("/img/check(1).png")));
@@ -889,32 +956,7 @@ public class Interface {
 		btnCancelPtrclo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
-				// Desabilita os botões
-				rdbDiex.setSelected(false);
-				rdbNud.setSelected(false);
-				cbxSindicante.setEnabled(false);
-				cbxSindicado.setEnabled(false);
-				dcSindicancia.setEnabled(false);
-				txtCaixa.setEnabled(false);
-				btnSavePrtclo.setEnabled(false);
-				btnCancelPtrclo.setEnabled(false);
-				btnAddPrtclo.setEnabled(true);
-				btnRmvPrtclo.setEnabled(true);
-				btnAlterPrtclo.setEnabled(true);
-				btnSrchPtclo.setEnabled(true);
-				rdbDiex.setEnabled(false);
-				rdbNud.setEnabled(false);
-				lblNumDiex.setVisible(false);
-				txtNumDiex.setVisible(false);
-
-				// Limpa todos os campos
-				dcSindicancia.setDate(null);
-				;
-				txtCaixa.setText("");
-				cbxSindicante.setSelectedItem(-1);
-				cbxSindicado.setSelectedItem(-1);
-				dcSindicancia.setEnabled(false);
-				txtCaixa.setEnabled(false);
+				formatarCamposPrtclo();
 			}
 		});
 		btnCancelPtrclo.setEnabled(false);
@@ -1011,6 +1053,12 @@ public class Interface {
 		dcSindicancia.setBounds(343, 187, 119, 23);
 		pnlProtocolos.add(dcSindicancia);
 		dcSindicancia.setEnabled(false);
+		
+		txtSindicado = new JTextField();
+		txtSindicado.setEnabled(false);
+		txtSindicado.setBounds(343, 155, 283, 23);
+		pnlProtocolos.add(txtSindicado);
+		txtSindicado.setColumns(10);
 
 		Panel pnlCorrespondencia = new Panel();
 		pnlCorrespondencia.setLayout(null);
@@ -1142,26 +1190,7 @@ public class Interface {
 		btnCancelMessage = new JButton("Cancelar");
 		btnCancelMessage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				rdbDiexMessage.setEnabled(false);
-				rdbNudMessage.setEnabled(false);
-				rdbOficio.setEnabled(false);
-				dcEncaminhamento.setEnabled(false);
-				txtRemetente.setEnabled(false);
-				txtDestinatario.setEnabled(false);
-				txtCidade.setEnabled(false);
-				cbxEstado.setEnabled(false);
-				txtCep.setEnabled(false);
-				txtTipoEnvio.setEnabled(false);
-				cbxProtocolista.setEnabled(false);
-				btnSaveMessage.setEnabled(false);
-				btnCancelMessage.setEnabled(false);
-				btnAlterMessage.setEnabled(true);
-				btnRmvMessage.setEnabled(true);
-				btnSrchMessage.setEnabled(true);
-				rdbNudMessage.setSelected(false);
-				rdbOficio.setSelected(false);
-				rdbDiexMessage.setSelected(false);
-				txtNumMessage.setEnabled(false);
+				formatarCamposMessage();
 			}
 		});
 		btnCancelMessage.setIcon(new ImageIcon(Interface.class.getResource("/img/remove.png")));
@@ -1485,7 +1514,8 @@ public class Interface {
 		}
 	}
 
-	private void pesquisar(String nomeMilitar) {
+	// Método que busca os registros no banco
+	private void pesquisarMilitar(String nomeMilitar) {
 
 		DefaultTableModel modelo = (DefaultTableModel) tblMil.getModel();
 		modelo.setNumRows(0);
@@ -1515,10 +1545,10 @@ public class Interface {
 			PreparedStatement pstm = null;
 			ResultSet rs = null;
 
-			String sql = "SELECT Militar.id_militar, Militar.nome_guerra, Militar.identidade, Graduacao.descricao, Dependencia.nome_dependencia FROM db_postman.Militar \n" + 
-					"INNER JOIN db_postman.Graduacao ON Militar.fk_graduacao = Graduacao.id_graduacao\n" + 
-					"INNER JOIN db_postman.Dependencia ON Militar.fk_dependencia = Dependencia.id_dependencia\n" + 
-					"WHERE db_postman.Militar.nome_guerra LIKE ?;";
+			String sql = "SELECT Militar.id_militar, Militar.nome_guerra, Militar.identidade, Graduacao.descricao, Dependencia.nome_dependencia FROM db_postman.Militar \n"
+					+ "INNER JOIN db_postman.Graduacao ON Militar.fk_graduacao = Graduacao.id_graduacao\n"
+					+ "INNER JOIN db_postman.Dependencia ON Militar.fk_dependencia = Dependencia.id_dependencia\n"
+					+ "WHERE db_postman.Militar.nome_guerra LIKE ?;";
 			pstm = conn.prepareStatement(sql);
 			pstm.setString(1, "%" + nomeMilitar + "%");
 			rs = pstm.executeQuery();
@@ -1532,8 +1562,170 @@ public class Interface {
 			Conexao.closeConnection(conn, (com.mysql.jdbc.PreparedStatement) pstm, rs);
 
 		} catch (Exception ex) {
-			JOptionPane.showMessageDialog(null, "Erro ao realizar Pesquisa! " + ex, "Erro",
-					JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Erro ao realizar Pesquisa! " + ex, "Erro", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+
+	// Método que busca os registros no banco
+	private void pesquisarDependencia(String nomeDependencia) {
+
+		DefaultTableModel modelo = (DefaultTableModel) tblDependencia.getModel();
+		modelo.setNumRows(0);
+		
+		tblDependencia.getColumnModel().getColumn(0).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(0).setPreferredWidth(62);
+		tblDependencia.getColumnModel().getColumn(1).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(1).setPreferredWidth(228);
+		tblDependencia.getColumnModel().getColumn(2).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(2).setPreferredWidth(94);
+		tblDependencia.getColumnModel().getColumn(3).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(3).setPreferredWidth(157);
+		tblDependencia.getColumnModel().getColumn(4).setResizable(false);
+		tblDependencia.getColumnModel().getColumn(4).setPreferredWidth(103);
+
+		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+		tblDependencia.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+		tblDependencia.getColumnModel().getColumn(1).setCellRenderer(centerRenderer);
+		tblDependencia.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
+		tblDependencia.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
+		tblDependencia.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
+
+		try {
+
+			Connection conn = Conexao.getConnection();
+			PreparedStatement pstm = null;
+			ResultSet rs = null;
+
+			String sql = "SELECT * FROM db_postman.Dependencia WHERE db_postman.Dependencia.nome_dependencia LIKE ?;";
+			pstm = conn.prepareStatement(sql);
+			pstm.setString(1, "%" + nomeDependencia + "%");
+			rs = pstm.executeQuery();
+
+			while (rs.next()) {
+
+				modelo.addRow(
+						new Object[] { rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5) });
+			}
+
+			Conexao.closeConnection(conn, (com.mysql.jdbc.PreparedStatement) pstm, rs);
+
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, "Erro ao realizar Pesquisa! " + ex, "Erro", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	// Método que limpa os campos da página Militares
+	private void formatarCamposMilitares() {
+
+		// esvazia os campos
+		txtNomeGuerra.setText("");
+		txtIdentidade.setText("");
+		txtSigla.setText("");
+		cbxGraduacao.setSelectedIndex(-1);
+		cbxDependencia.setSelectedIndex(-1);
+
+		// desabilita os campos e botões
+		btnSaveMil.setEnabled(false);
+		btnCancelMil.setEnabled(false);
+		btnAddMil.setEnabled(true);
+		btnAlterMil.setEnabled(true);
+		btnRmvMil.setEnabled(true);
+		btnSrchMil.setEnabled(true);
+		txtNomeGuerra.setEnabled(false);
+		txtIdentidade.setEnabled(false);
+
+		cbxGraduacao.setEnabled(false);
+		cbxDependencia.setEnabled(false);
+
+		insert = false;
+		update = false;
+	}
+
+	// Método que limpa os campos da página Dependencia
+	private void formatarCamposDepndcia() {
+
+		// esvazia os campos
+		txtDependencia.setText("");
+		txtSigla.setText("");
+		txtOM.setText("");
+		txtContato.setText("");
+
+		// desabilita os campos e botões
+		btnSaveDpdncia.setEnabled(false);
+		btnCancelDpdncia.setEnabled(false);
+		btnAddDpdncia.setEnabled(true);
+		btnAlterDpdncia.setEnabled(true);
+		btnRmvDpdncia.setEnabled(true);
+		btnSrchDpdncia.setEnabled(true);
+		txtDependencia.setEnabled(false);
+		txtSigla.setEnabled(false);
+		txtOM.setEnabled(false);
+		txtContato.setEnabled(false);
+
+		insert = false;
+		update = false;
+	}
+
+	// Método que limpa os campos da página Protocolo
+	private void formatarCamposPrtclo() {
+
+		//esvazia os campos
+		rdbDiex.setSelected(false);
+		rdbNud.setSelected(false);
+		lblNumDiex.setVisible(false);
+		txtNumDiex.setText("");
+		cbxSindicante.setSelectedIndex(-1);
+		txtSindicado.setText("");
+		dcSindicancia.setDate(null);
+		txtCaixa.setText("");
+		
+		// desabilita campos e botões
+		rdbDiex.setEnabled(false);
+		rdbNud.setEnabled(false);
+		txtNumDiex.setVisible(false);
+		cbxSindicante.setEnabled(false);
+		txtSindicado.setEnabled(false);
+		dcSindicancia.setEnabled(false);
+		txtCaixa.setEnabled(false);
+		btnCancelPtrclo.setEnabled(false);
+		btnSavePrtclo.setEnabled(false);
+		
+		btnAddPrtclo.setEnabled(true);
+		btnAlterPrtclo.setEnabled(true);
+		btnRmvPrtclo.setEnabled(true);
+		btnSrchPtclo.setEnabled(true);
+
+		insert = false;
+		update = false;
+	}
+
+	// Método que limpa os campos da página Protocolo
+	private void formatarCamposMessage() {
+
+		// Desabilita campos e botões
+		rdbDiexMessage.setEnabled(false);
+		rdbNudMessage.setEnabled(false);
+		rdbOficio.setEnabled(false);
+		dcEncaminhamento.setEnabled(false);
+		txtRemetente.setEnabled(false);
+		txtDestinatario.setEnabled(false);
+		txtCidade.setEnabled(false);
+		cbxEstado.setEnabled(false);
+		txtCep.setEnabled(false);
+		txtTipoEnvio.setEnabled(false);
+		cbxProtocolista.setEnabled(false);
+		btnSaveMessage.setEnabled(false);
+		btnCancelMessage.setEnabled(false);
+		btnAlterMessage.setEnabled(true);
+		btnRmvMessage.setEnabled(true);
+		btnSrchMessage.setEnabled(true);
+		rdbNudMessage.setSelected(false);
+		rdbOficio.setSelected(false);
+		rdbDiexMessage.setSelected(false);
+		txtNumMessage.setEnabled(false);
+
+		insert = false;
+		update = false;
 	}
 }

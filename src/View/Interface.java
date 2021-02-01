@@ -56,6 +56,8 @@ import Model.Sindicancia;
 import javax.swing.ScrollPaneConstants;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class Interface {
 
@@ -93,6 +95,11 @@ public class Interface {
 
 	private boolean insert, update = false;
 	private JTextField txtSindicado;
+	
+	
+	private ArrayList<Dependencia> listaDependencia = new ArrayList<Dependencia>();
+	private ArrayList<Graduacao> listaGraduacao = new ArrayList<Graduacao>();
+	private ArrayList<Militar> listaMilitar = new ArrayList<Militar>();
 
 	/**
 	 * Launch the application.
@@ -131,11 +138,6 @@ public class Interface {
 		// Listagem dos campos Dependencia e Graduação dos Combobox
 		DependenciaDAO daoDep = new DependenciaDAO();
 		MilitarDAO daoMil = new MilitarDAO();
-
-
-		ArrayList<Dependencia> listaDependencia = new ArrayList<Dependencia>();
-		ArrayList<Graduacao> listaGraduacao = new ArrayList<Graduacao>();
-		ArrayList<Militar> listaMilitar = new ArrayList<Militar>();
 
 		listaDependencia = (ArrayList<Dependencia>) daoDep.listar();
 		listaGraduacao = (ArrayList<Graduacao>) daoMil.listarGraduacao();
@@ -860,7 +862,7 @@ public class Interface {
 		btnAlterPrtclo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// Verifica se o usuário selecionou algum registro da tabela
-				if (txtNomeGuerra.getText().isEmpty()) {
+				if (cbxSindicante.getSelectedIndex() == 0) {
 					JOptionPane.showMessageDialog(null, "Selecione a sindicância que deseja alterar na tabela!",
 							"Informação", JOptionPane.INFORMATION_MESSAGE);
 				} else {
@@ -889,10 +891,18 @@ public class Interface {
 		btnRmvPrtclo.setIcon(new ImageIcon(Interface.class.getResource("/img/remove(1).png")));
 		btnRmvPrtclo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (cbxSindicante.getSelectedIndex() == -1) {
+				if (cbxSindicante.getSelectedIndex() == 0) {
 					System.out.println("Selecione um registro para a remoção!");
 				} else {
 					// Remove o registro
+					SindicanciaDAO sindDAO = new SindicanciaDAO();
+					Sindicancia objSind = new Sindicancia();
+
+					int linha = tblSindicancia.getSelectedRow();
+					objSind = sindDAO.listar().get(linha);
+
+					sindDAO.excluirSindicancia(objSind);
+					carregarTabelaSindicancia();
 				}
 			}
 		});
@@ -930,7 +940,7 @@ public class Interface {
 
 				} else {
 					
-					int linha = tblMil.getSelectedRow();
+					int linha = tblSindicancia.getSelectedRow();
 					objSind = sindDAO.listar().get(linha);
 
 					objSind.setNumDiex(Integer.parseInt(txtNumDiex.getText()));
@@ -994,7 +1004,19 @@ public class Interface {
 				}
 				
 				txtNumDiex.setText(String.valueOf(objSind.getNumDiex()));
-				cbxSindicante.setSelectedItem(objSind.getSindicante());
+				
+				int index = 0;
+				
+				for (Militar mil : listaMilitar) {
+					
+					index++;
+					
+					if (mil.getIdMilitar() == objSind.getSindicante()) {
+						break;
+					}
+				}
+				
+				cbxSindicante.setSelectedIndex(index);
 				txtSindicado.setText(objSind.getSindicado());
 				dcSindicancia.setDate(objSind.getData_sindicancia());
 				txtCaixa.setText(String.valueOf(objSind.getCaixa()));
@@ -1686,8 +1708,8 @@ public class Interface {
 		txtNomeGuerra.setText("");
 		txtIdentidade.setText("");
 		txtSigla.setText("");
-		cbxGraduacao.setSelectedIndex(-1);
-		cbxDependencia.setSelectedIndex(-1);
+		cbxGraduacao.setSelectedIndex(0);
+		cbxDependencia.setSelectedIndex(0);
 
 		// desabilita os campos e botões
 		btnSaveMil.setEnabled(false);
@@ -1739,7 +1761,7 @@ public class Interface {
 		rdbNud.setSelected(false);
 		lblNumDiex.setVisible(false);
 		txtNumDiex.setText("");
-		cbxSindicante.setSelectedIndex(-1);
+		cbxSindicante.setSelectedIndex(0);
 		txtSindicado.setText("");
 		dcSindicancia.setDate(null);
 		txtCaixa.setText("");

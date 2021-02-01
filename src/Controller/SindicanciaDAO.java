@@ -62,7 +62,7 @@ public class SindicanciaDAO {
 		try {
 
 			String sql = "UPDATE Sindicancia SET fk_documento = ?, num_diex = ?, fk_militar = ?, sindicado = ?,"
-					+ "data_sindicancia = ?, caixa = ? WHERE id_militar = ?;";
+					+ "data_sindicancia = ?, caixa = ? WHERE id_sindicancia = ?;";
 			pstm = conn.prepareStatement(sql);
 
 			pstm.setInt(1, sind.getIdDocumento());
@@ -85,14 +85,14 @@ public class SindicanciaDAO {
 	}
 
 	// Método para excluir Sindicâncias
-	public void excluirMilitar(Sindicancia sind) {
+	public void excluirSindicancia(Sindicancia sind) {
 
 		Connection conn = Conexao.getConnection();
 		PreparedStatement pstm = null;
 
 		try {
 
-			String sql = "DELETE FROM Sindicancia WHERE id_militar = ?;";
+			String sql = "DELETE FROM Sindicancia WHERE id_sindicancia = ?;";
 			pstm = conn.prepareStatement(sql);
 
 			pstm.setInt(1, sind.getIdSindicancia());

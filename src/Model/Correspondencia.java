@@ -11,10 +11,11 @@ public class Correspondencia {
 	private String remetente;
 	private String destinatario;
 	private String cidade;
-	private String estado;
+	private int estado;
 	private String cep;
 	private String envio;
 	private int idProtocolista;
+	private String numRastreio;
 	
 	public Correspondencia() {
 		// TODO Auto-generated constructor stub
@@ -76,14 +77,6 @@ public class Correspondencia {
 		this.cidade = cidade;
 	}
 
-	public String getEstado() {
-		return estado;
-	}
-
-	public void setEstado(String estado) {
-		this.estado = estado;
-	}
-
 	public String getCep() {
 		return cep;
 	}
@@ -108,11 +101,34 @@ public class Correspondencia {
 		this.idProtocolista = idProtocolista;
 	}
 
+	public int getEstado() {
+		return estado;
+	}
+
+	public void setEstado(int estado) {
+		this.estado = estado;
+	}
+
+	public String getNumRastreio() {
+		return numRastreio;
+	}
+
+	public void setNumRastreio(String numRastreio) {
+		this.numRastreio = numRastreio;
+	}
+
 	@Override
 	public String toString() {
 		return "Correspondencia [idCorrespondencia=" + idCorrespondencia + ", idDocumento=" + idDocumento
 				+ ", numDocumento=" + numDocumento + ", dataDocumento=" + dataDocumento + ", remetente=" + remetente
 				+ ", destinatario=" + destinatario + ", cidade=" + cidade + ", estado=" + estado + ", cep=" + cep
-				+ ", envio=" + envio + ", idProtocolista=" + idProtocolista + "]";
+				+ ", envio=" + envio + ", idProtocolista=" + idProtocolista + ", numRastreio=" + numRastreio
+				+ ", getIdCorrespondencia()=" + getIdCorrespondencia() + ", getIdDocumento()=" + getIdDocumento()
+				+ ", getNumDocumento()=" + getNumDocumento() + ", getDataDocumento()=" + getDataDocumento()
+				+ ", getRemetente()=" + getRemetente() + ", getDestinatario()=" + getDestinatario() + ", getCidade()="
+				+ getCidade() + ", getCep()=" + getCep() + ", getEnvio()=" + getEnvio() + ", getIdProtocolista()="
+				+ getIdProtocolista() + ", getEstado()=" + getEstado() + ", getNumRastreio()=" + getNumRastreio()
+				+ ", getClass()=" + getClass() + ", hashCode()=" + hashCode() + ", toString()=" + super.toString()
+				+ "]";
 	}
 }

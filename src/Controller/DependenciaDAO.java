@@ -29,7 +29,7 @@ public class DependenciaDAO {
 		// Inserção de dados na tabela Dependencia
 		try {
 
-			String sql = "INSERT INTO Dependencia (nome_dependencia, sigla_dependencia, om_dependencia, contato_dependencia) values (?, ?, ?, ?);";
+			String sql = "INSERT INTO Dependencia (nome_dependencia, sigla, om_dependencia, contato_dependencia) values (?, ?, ?, ?);";
 			pstm = conn.prepareStatement(sql);
 
 			pstm.setString(1, dep.getNomeDependencia());
@@ -58,7 +58,7 @@ public class DependenciaDAO {
 
 		// Alteração de dados na tabela dependência
 		try {
-			String sql = "UPDATE Dependencia SET nome_dependencia = ?, sigla_dependencia = ?, om_dependencia = ?, contato_dependencia = ?"
+			String sql = "UPDATE Dependencia SET nome_dependencia = ?, sigla = ?, om_dependencia = ?, contato_dependencia = ?"
 					+ "WHERE id_dependencia = ?;";
 			pstm = conn.prepareStatement(sql);
 
@@ -102,6 +102,7 @@ public class DependenciaDAO {
 		}
 	}
 
+	//Método para listar Dependências
 	public List<Dependencia> listar() {
 
 		List<Dependencia> listaDependencia = new ArrayList<Dependencia>();

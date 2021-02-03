@@ -22,7 +22,7 @@ public class MilitarDAO {
 		// TODO Auto-generated constructor stub
 	}
 
-	//Método para salvar Militares
+	// Método para salvar Militares
 	public void salvarMilitar(Militar mil) {
 
 		Connection conn = Conexao.getConnection();
@@ -48,7 +48,7 @@ public class MilitarDAO {
 
 	}
 
-	//Método para alterar Militares
+	// Método para alterar Militares
 	public void alterarMilitar(Militar mil) {
 
 		Connection conn = Conexao.getConnection();
@@ -77,7 +77,7 @@ public class MilitarDAO {
 		}
 	}
 
-	//Método para excluir Militares
+	// Método para excluir Militares
 	public void excluirMilitar(Militar mil) {
 
 		Connection conn = Conexao.getConnection();
@@ -101,7 +101,7 @@ public class MilitarDAO {
 		}
 	}
 
-	//Método para Listar o campo Graduação
+	// Método para Listar o campo Graduação
 	public List<Graduacao> listarGraduacao() {
 
 		List<Graduacao> listaGraduacao = new ArrayList<Graduacao>();
@@ -134,7 +134,7 @@ public class MilitarDAO {
 		return listaGraduacao;
 	}
 
-	//Método para Listar todos os Militares
+	// Método para Listar todos os Militares
 	public List<Militar> listar() {
 
 		List<Militar> listaGraduacao = new ArrayList<Militar>();
@@ -170,4 +170,42 @@ public class MilitarDAO {
 		return listaGraduacao;
 	}
 
+	// Método para Listar apenas os Militares da dependencia dos correios
+	public List<Militar> listarProtocolista() {
+
+		List<Militar> listaGraduacao = new ArrayList<Militar>();
+
+		Connection conn = Conexao.getConnection();
+		PreparedStatement pstm = null;
+		ResultSet rs = null;
+
+		try {
+
+			//O ID PASSADO PARA A FK DEVE SER ALTERADO PARA 1, SEGUINDO O PROTOCOLO
+			//DE CONSISTÊNCIAS DA DOCUMENTAÇÃO CRIADA
+			//ATRIBUIU-SE 2, APENAS PARA A REALIZAÇÃO DE TESTES
+			String sql = "SELECT * FROM Militar WHERE Militar.fk_dependencia = 1";
+			pstm = conn.prepareStatement(sql);
+			rs = pstm.executeQuery();
+
+			while (rs.next()) {
+
+				Militar mil = new Militar();
+				mil.setIdMilitar(rs.getInt(1));
+				mil.setNomeGuerra(rs.getString(2));
+				mil.setIdentidade(rs.getInt(3));
+				mil.setGraduacao(rs.getInt(4));
+				mil.setDependencia(rs.getInt(5));
+
+				listaGraduacao.add(mil);
+			}
+
+		} catch (Exception ex) {
+			JOptionPane.showMessageDialog(null, "Erro ao Listar Militar!" + ex, "Erro", JOptionPane.ERROR_MESSAGE);
+		} finally {
+			Conexao.closeConnection(conn, (com.mysql.jdbc.PreparedStatement) pstm, rs);
+		}
+
+		return listaGraduacao;
+	}
 }

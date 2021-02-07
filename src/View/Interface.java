@@ -38,10 +38,13 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.MaskFormatter;
+
 import com.toedter.calendar.JDateChooser;
 
 import Connection.Conexao;
@@ -62,14 +65,16 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import javax.swing.JFormattedTextField;
 
 public class Interface {
 
 	// Todas as declarações dos componentes do sistema
 	private JFrame frmCartEletronico;
 
-	private JTextField txtNumDiex, txtDependencia, txtOM, txtNomeGuerra, txtIdentidade, txtCaixa, txtContato,
-			txtTipoEnvio, txtCep, txtPesquisa, txtPesqDpdncia, txtPesqPtclo, txtPesqMessage;
+	private JTextField txtNumDiex, txtDependencia, txtOM, txtNomeGuerra, txtCaixa,
+			txtTipoEnvio, txtPesquisa, txtPesqDpdncia, txtPesqPtclo, txtPesqMessage, txtSindicado,
+			txtNumMessage, txtRemetente, txtDestinatario, txtCidade, txtRastreio, txtSigla;
 
 	private JButton btnCancelMil, btnSaveMil, btnAlterMil, btnRmvMil, btnAlterDpdncia, btnRmvDpdncia, btnSaveDpdncia,
 			btnAddPrtclo, btnCancelDpdncia, btnAlterPrtclo, btnRmvPrtclo, btnSavePrtclo, btnCancelPtrclo,
@@ -78,7 +83,7 @@ public class Interface {
 			btnRmvMessage, btnSrchMessage, btnAddMil, btnAddDpdncia;
 
 	private JLabel lblDependencia, lblTitleMil, lblNumDiex, lblEstado, lblTipoEnvio, lblCep, lblProtocolista,
-			lblPesqMil, lblPesqDpdncia, lblPesqPtclo, lblBuscarMessage, lblData;
+			lblPesqMil, lblPesqDpdncia, lblPesqPtclo, lblBuscarMessage, lblData, lblSigla;
 
 	private JDateChooser dcEncaminhamento, dcSindicancia;
 
@@ -87,23 +92,19 @@ public class Interface {
 
 	private JRadioButton rdbDiex, rdbNud, rdbDiexMessage, rdbOficio, rdbNudMessage;
 
-	private JTable tblMil, tblDependencia, tblSindicancia;;
+	private JTable tblMil, tblDependencia, tblSindicancia, tblCorrespondencia;
 
 	private JScrollPane scrlpDependecia;
 
-	private JTextField txtNumMessage, txtRemetente, txtDestinatario, txtCidade;
-	private JTable tblCorrespondencia;
-	private JTextField txtRastreio;
-	private JTextField txtSigla;
-	private JLabel lblSigla;
+	private JFormattedTextField txtIdentidade, txtContato;
 
 	private boolean insert, update = false;
-	private JTextField txtSindicado;
 
 	private ArrayList<Dependencia> listaDependencia = new ArrayList<Dependencia>();
 	private ArrayList<Graduacao> listaGraduacao = new ArrayList<Graduacao>();
 	private ArrayList<Militar> listaMilitar = new ArrayList<Militar>();
 	private ArrayList<Militar> listaSindicantes = new ArrayList<Militar>();
+	private JFormattedTextField txtCep;
 
 	/**
 	 * Launch the application.
@@ -194,6 +195,16 @@ public class Interface {
 		frmCartEletronico.getContentPane().setLayout(null);
 
 		JTabbedPane mainTabs = new JTabbedPane(JTabbedPane.TOP);
+		mainTabs.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				if (!(mainTabs.getSelectedIndex() == 0)) {
+					formatarCamposMilitar();
+					formatarCamposDepndcia();
+					formatarCamposPrtclo();
+					formatarCamposMessage();
+				}
+			}
+		});
 		mainTabs.setBounds(0, 0, 867, 568);
 		frmCartEletronico.getContentPane().add(mainTabs);
 
@@ -218,12 +229,14 @@ public class Interface {
 		lblIdentidade.setBounds(236, 107, 72, 15);
 		lblIdentidade.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		pnlMilitares.add(lblIdentidade);
-
-		txtIdentidade = new JTextField();
-		txtIdentidade.setBounds(316, 103, 234, 23);
+		
+		try {
+			txtIdentidade = new JFormattedTextField(new MaskFormatter("###########-#"));
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
 		txtIdentidade.setEnabled(false);
-		txtIdentidade.setFont(new Font("Liberation Sans", Font.BOLD, 13));
-		txtIdentidade.setColumns(10);
+		txtIdentidade.setBounds(316, 103, 234, 23);
 		pnlMilitares.add(txtIdentidade);
 
 		JLabel lblGraduacao = new JLabel("Graduação:");
@@ -260,15 +273,15 @@ public class Interface {
 		btnAddMil.setBounds(12, 22, 109, 27);
 		btnAddMil.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+				formatarCamposMilitar();
+				
 				// recarrega o combobox de dependências
 				DependenciaDAO daoDep = new DependenciaDAO();
 
 				listaDependencia.clear();
-
 				listaDependencia = (ArrayList<Dependencia>) daoDep.listar();
-
 				cbxDependencia.removeAllItems();
-
 				cbxDependencia.setModel(new DefaultComboBoxModel(new String[] { "Selecione a dependência" }));
 
 				for (Dependencia d : listaDependencia) {
@@ -400,6 +413,7 @@ public class Interface {
 				}
 
 				carregarTabelaMilitar();
+				formatarCamposMilitar();
 			}
 		});
 		btnSaveMil.setHorizontalAlignment(SwingConstants.LEFT);
@@ -582,6 +596,9 @@ public class Interface {
 		btnAddDpdncia.setIcon(new ImageIcon(Interface.class.getResource("/img/plus(1).png")));
 		btnAddDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
+				formatarCamposDepndcia();
+				
 				txtDependencia.setEnabled(true);
 				txtSigla.setEnabled(true);
 				txtOM.setEnabled(true);
@@ -649,13 +666,6 @@ public class Interface {
 		});
 		pnlDependencias.add(btnRmvDpdncia);
 
-		txtContato = new JTextField();
-		txtContato.setBounds(318, 167, 234, 23);
-		txtContato.setFont(new Font("Liberation Sans", Font.BOLD, 13));
-		txtContato.setEnabled(false);
-		txtContato.setColumns(10);
-		pnlDependencias.add(txtContato);
-
 		btnSaveDpdncia = new JButton("  Salvar");
 		btnSaveDpdncia.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -686,6 +696,7 @@ public class Interface {
 				}
 
 				carregarTabelaDependencia();
+				formatarCamposDepndcia();
 			}
 		});
 		btnSaveDpdncia.setBounds(641, 77, 109, 27);
@@ -806,6 +817,15 @@ public class Interface {
 		lblSigla.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		lblSigla.setBounds(161, 111, 149, 15);
 		pnlDependencias.add(lblSigla);
+		
+		try {
+			txtContato = new JFormattedTextField(new MaskFormatter("(##) ####-####"));
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
+		txtContato.setEnabled(false);
+		txtContato.setBounds(318, 167, 234, 23);
+		pnlDependencias.add(txtContato);
 
 		Panel pnlProtocolos = new Panel();
 		pnlProtocolos.setLayout(null);
@@ -891,15 +911,13 @@ public class Interface {
 		btnAddPrtclo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
+				formatarCamposPrtclo();
+				
 				// recarrega o combobox de sindicantes
 				MilitarDAO milDAO = new MilitarDAO();
-
 				listaMilitar.clear();
-
 				listaMilitar = (ArrayList<Militar>) milDAO.listar();
-
 				cbxSindicante.removeAllItems();
-
 				cbxSindicante.setModel(new DefaultComboBoxModel(new String[] { "Selecione o sindicante" }));
 
 				for (Militar m : listaMilitar) {
@@ -1051,6 +1069,7 @@ public class Interface {
 				}
 
 				carregarTabelaSindicancia();
+				formatarCamposPrtclo();
 			}
 		});
 		btnSavePrtclo.setHorizontalTextPosition(SwingConstants.RIGHT);
@@ -1235,15 +1254,13 @@ public class Interface {
 		btnAddMessage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
+				formatarCamposMessage();
+				
 				// recarrega o combobox com protocolistas da seção dos correios
 				MilitarDAO milDAO = new MilitarDAO();
-
 				listaSindicantes.clear();
-
 				listaSindicantes = (ArrayList<Militar>) milDAO.listarProtocolista();
-
 				cbxProtocolista.removeAllItems();
-
 				cbxProtocolista.setModel(new DefaultComboBoxModel(new String[] { "Selecione o protocolista" }));
 
 				for (Militar m : listaSindicantes) {
@@ -1408,6 +1425,7 @@ public class Interface {
 				}
 
 				carregarTabelaCorrespondencia();
+				formatarCamposMessage();
 			}
 		});
 		btnSaveMessage.setIcon(new ImageIcon(Interface.class.getResource("/img/check(1).png")));
@@ -1578,13 +1596,6 @@ public class Interface {
 		txtTipoEnvio.setBounds(507, 214, 105, 23);
 		pnlCorrespondencia.add(txtTipoEnvio);
 
-		txtCep = new JTextField();
-		txtCep.setFont(new Font("Liberation Sans", Font.BOLD, 13));
-		txtCep.setEnabled(false);
-		txtCep.setColumns(10);
-		txtCep.setBounds(316, 214, 80, 23);
-		pnlCorrespondencia.add(txtCep);
-
 		lblCep = new JLabel("CEP:");
 		lblCep.setFont(new Font("Liberation Sans", Font.BOLD, 13));
 		lblCep.setBounds(278, 218, 30, 15);
@@ -1683,6 +1694,16 @@ public class Interface {
 		txtRastreio.setColumns(10);
 		txtRastreio.setBounds(316, 276, 234, 23);
 		pnlCorrespondencia.add(txtRastreio);
+		
+		
+		try {
+			txtCep = new JFormattedTextField(new MaskFormatter("#####-###"));
+		} catch (ParseException e1) {
+			e1.printStackTrace();
+		}
+		txtCep.setEnabled(false);
+		txtCep.setBounds(316, 214, 80, 23);
+		pnlCorrespondencia.add(txtCep);
 	}
 
 	// Método que carrega a tabela de dependências
